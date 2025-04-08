@@ -42,6 +42,16 @@ clean:
 	docker rm -f $(FRONTEND_CONTAINER) || true
 	docker rmi $(FRONTEND_IMAGE) || true
 
+killall: 
+	docker-compose down -v --remove-orphans
+
+startall:
+	docker-compose up --build
+
+rebuildall:
+	docker-compose down -v --remove-orphans
+	docker-compose up --build
+
 # Logs viewing
 logs-backend:
 	@$(MAKE) -C server logs
