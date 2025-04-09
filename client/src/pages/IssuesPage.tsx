@@ -18,6 +18,9 @@ const IssuesPage: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>(); // Получаем dispatch для отправки действий
   const tasks = useSelector(selectTasks); // Получаем задачи из Redux
+  React.useEffect(() => {
+    dispatch(fetchTasks()); // Загружаем задачи при монтировании компонента
+  }, [dispatch]);
 
   // Получаем задачи с сервера
   React.useEffect(() => {
@@ -45,14 +48,14 @@ const IssuesPage: React.FC = () => {
   const filteredTasks = tasks.filter((task) => {
     return (
       (searchTitle === '' || task.title.toLowerCase().includes(searchTitle.toLowerCase())) &&
-      (searchAssignee === '' || task.assignee.fullName.toLowerCase().includes(searchAssignee.toLowerCase())) &&
+      (searchAssignee === '' || task?.assignee?.fullName.toLowerCase().includes(searchAssignee.toLowerCase())) &&
       (filterStatus === '' || task.status === filterStatus) &&
-      (filterBoard === '' || task.board.name === filterBoard)
+      (filterBoard === '' || task.boardName === filterBoard)
     );
   });
-
+console.log(filteredTasks)
   return (
-    <Container maxWidth="lg" style={{ backgroundColor: '#f5f5f5', padding: '20px' }}> {/* Устанавливаем фон и отступы */}
+    <Container maxWidth="lg" style={{ padding: '20px' }}> {/* Устанавливаем фон и отступы */}
       <Grid container spacing={2} style={{ marginTop: '20px' }}>
         <Grid item xs={12}>
           <TextField
@@ -97,8 +100,8 @@ const IssuesPage: React.FC = () => {
             >
               <MenuItem value="">Все</MenuItem>
               {tasks.map((task) => (
-                <MenuItem key={task.board.id} value={task.board.name}>
-                  {task.board.name}
+                <MenuItem key={task.id} value={task.boardName}>
+                  {task.boardName}
                 </MenuItem>
               ))}
             </Select>
@@ -107,7 +110,7 @@ const IssuesPage: React.FC = () => {
         <Grid item xs={12}>
           <List>
             {filteredTasks.map((task) => (
-              <ListItem key={task.id} button onClick={() => handleTaskClick(task)}>
+              <ListItem key={task.id} onClick={() => handleTaskClick(task)}>
                 <ListItemText primary={task.title} />
               </ListItem>
             ))}

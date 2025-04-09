@@ -3,7 +3,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, S
 import { useDispatch, useSelector } from 'react-redux';
 import { createTaskAsync } from '../redux/tasks/tasksThunks';
 import { AppDispatch } from '../redux/store';
-import { selectBoards } from '../redux/boards/boardsSlice';
+import { fetchBoardsAsync, selectBoards } from '../redux/boards/boardsSlice';
 import { fetchUsers } from '../redux/users/usersApi';
 import { selectUsers } from '../redux/users/usersSlice';
 
@@ -16,14 +16,17 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onC
   const [assigneeId, setAssigneeId] = useState(0); // Исполнитель задачи
   const [selectedBoardId, setSelectedBoardId] = useState(0); // Выбранная доска
 
-  const boards = useSelector(selectBoards); // Получаем доски из стора
-  const users = useSelector(selectUsers); // Получаем доски из стора
-  
   const dispatch = useDispatch<AppDispatch>(); // Получаем dispatch для отправки действий
-
+  
+  const users = useSelector(selectUsers); // Получаем доски из стора
   // Получаем исполнителей с сервера
   useEffect(() => {
     dispatch(fetchUsers());
+  }, [dispatch]);
+
+  const boards = useSelector(selectBoards); // Получаем доски из стора
+  React.useEffect(() => {
+    dispatch(fetchBoardsAsync()); // Загружаем доски при монтировании компонента
   }, [dispatch]);
   
   // Обработчик отправки формы
