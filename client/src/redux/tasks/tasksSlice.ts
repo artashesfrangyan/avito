@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { ITask } from './types';
 import { createTaskAsync, fetchTasks, updateTaskAsync } from './tasksThunks';
+import { ITask } from '../../types/task';
 
 // Состояние задач
-export interface TasksState {
+interface TasksState {
   tasks: ITask[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;

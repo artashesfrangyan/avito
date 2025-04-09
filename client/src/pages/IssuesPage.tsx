@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchTasks, updateTaskAsync } from '../redux/tasks/tasksThunks';
-import { List, ListItem, ListItemText, Container, Grid, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { List, ListItem, ListItemText, Container, Grid, TextField, Select, MenuItem, FormControl, InputLabel, Box } from '@mui/material';
 import { AppDispatch } from '../redux/store';
 import TaskForm from '../components/TaskForm';
 import { ITask } from '../types/task';
 import { selectTasks } from '../redux/tasks/tasksSlice';
+import { fetchBoardsAsync, selectBoards } from '../redux/boards/boardsSlice';
 
 // Компонент страницы всех задач
 const IssuesPage: React.FC = () => {
@@ -25,6 +26,11 @@ const IssuesPage: React.FC = () => {
   // Получаем задачи с сервера
   React.useEffect(() => {
     dispatch(fetchTasks());
+  }, [dispatch]);
+
+  const boards = useSelector(selectBoards); // Получаем доски из стора
+  React.useEffect(() => {
+    dispatch(fetchBoardsAsync()); // Загружаем доски при монтировании компонента
   }, [dispatch]);
 
   // Обработчик закрытия попапа
@@ -53,70 +59,60 @@ const IssuesPage: React.FC = () => {
       (filterBoard === '' || task.boardName === filterBoard)
     );
   });
-console.log(filteredTasks)
+  
   return (
-    <Container maxWidth="lg" style={{ padding: '20px' }}> {/* Устанавливаем фон и отступы */}
-      <Grid container spacing={2} style={{ marginTop: '20px' }}>
-        <Grid item xs={12}>
-          <TextField
-            label="Поиск по названию задачи"
-            value={searchTitle}
-            onChange={(e) => setSearchTitle(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="Поиск по исполнителю"
-            value={searchAssignee}
-            onChange={(e) => setSearchAssignee(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="status-label">Фильтр по статусу</InputLabel>
-            <Select
-              labelId="status-label"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <MenuItem value="">Все</MenuItem>
-              <MenuItem value="Backlog">Backlog</MenuItem>
-              <MenuItem value="InProgress">In Progress</MenuItem>
-              <MenuItem value="Done">Done</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12}>
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="board-label">Фильтр по доске</InputLabel>
-            <Select
-              labelId="board-label"
-              value={filterBoard}
-              onChange={(e) => setFilterBoard(e.target.value)}
-            >
-              <MenuItem value="">Все</MenuItem>
-              {tasks.map((task) => (
-                <MenuItem key={task.id} value={task.boardName}>
-                  {task.boardName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12}>
-          <List>
-            {filteredTasks.map((task) => (
-              <ListItem key={task.id} onClick={() => handleTaskClick(task)}>
-                <ListItemText primary={task.title} />
-              </ListItem>
+    <Container maxWidth="lg" style={{ padding: '20px' }}>
+      <Box display="flex" gap={2} style={{ marginTop: '20px' }}>
+        <TextField
+          label="Поиск по названию задачи"
+          value={searchTitle}
+          onChange={(e) => setSearchTitle(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Поиск по исполнителю"
+          value={searchAssignee}
+          onChange={(e) => setSearchAssignee(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="status-label">Фильтр по статусу</InputLabel>
+          <Select
+            labelId="status-label"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <MenuItem value="">Все</MenuItem>
+            <MenuItem value="Backlog">Backlog</MenuItem>
+            <MenuItem value="InProgress">In Progress</MenuItem>
+            <MenuItem value="Done">Done</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="board-label">Фильтр по доске</InputLabel>
+          <Select
+            labelId="board-label"
+            value={filterBoard}
+            onChange={(e) => setFilterBoard(e.target.value)}
+          >
+            <MenuItem value="">Все</MenuItem>
+            {boards.map(({name, id}) => (
+              <MenuItem key={id} value={name}>
+                {name}
+              </MenuItem>
             ))}
-          </List>
-        </Grid>
-      </Grid>
+          </Select>
+        </FormControl>
+      </Box>
+      <List>
+        {filteredTasks.map((task) => (
+          <ListItem key={task.id} onClick={() => handleTaskClick(task)}>
+            <ListItemText primary={task.title} />
+          </ListItem>
+        ))}
+      </List>
       <TaskForm open={open} onClose={handleClose} task={selectedTask} onUpdateTask={handleUpdateTask} />
     </Container>
   );
