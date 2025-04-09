@@ -3,16 +3,9 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, S
 import { useDispatch, useSelector } from 'react-redux';
 import { createTaskAsync } from '../redux/tasks/tasksThunks';
 import { AppDispatch } from '../redux/store';
-import axios from 'axios';
 import { selectBoards } from '../redux/boards/boardsSlice';
-
-// Интерфейс исполнителя
-interface IUser {
-  id: number;
-  fullName: string;
-  email: string;
-  avatarUrl: string;
-}
+import { fetchUsers } from '../redux/users/usersApi';
+import { selectUsers } from '../redux/users/usersSlice';
 
 // Компонент формы для создания задачи
 const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onClose }) => {
@@ -21,25 +14,18 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onC
   const [priority, setPriority] = useState('Medium'); // Приоритет задачи
   const [status, setStatus] = useState('Backlog'); // Статус задачи
   const [assigneeId, setAssigneeId] = useState(0); // Исполнитель задачи
-  const [assignees, setAssignees] = useState<IUser[]>([]); // Список исполнителей
   const [selectedBoardId, setSelectedBoardId] = useState(0); // Выбранная доска
 
   const boards = useSelector(selectBoards); // Получаем доски из стора
+  const users = useSelector(selectUsers); // Получаем доски из стора
+  
   const dispatch = useDispatch<AppDispatch>(); // Получаем dispatch для отправки действий
 
   // Получаем исполнителей с сервера
   useEffect(() => {
-    const fetchAssignees = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/api/v1/users');
-        setAssignees(response.data.data); // Устанавливаем исполнителей
-      } catch (error) {
-        console.error('Error fetching assignees:', error);
-      }
-    };
-    fetchAssignees();
-  }, []);
-
+    dispatch(fetchUsers());
+  }, [dispatch]);
+console.log(users.length)
   // Обработчик отправки формы
   const handleSubmit = () => {
     dispatch(createTaskAsync({ assigneeId, boardId: selectedBoardId, description, priority, title, status })); // Отправляем задачу на сервер
@@ -109,9 +95,9 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onC
             value={assigneeId}
             onChange={(e) => setAssigneeId(Number(e.target.value))}
           >
-            {Array.isArray(assignees) && assignees.map((assignee) => ( // Проверяем, что assignees является массивом
-              <MenuItem key={assignee.id} value={assignee.id}>
-                {assignee.fullName}
+            {Array.isArray(users) && users.map((user) => ( // Проверяем, что users является массивом
+              <MenuItem key={user.id} value={user.id}>
+                {user.fullName}
               </MenuItem>
             ))}
           </Select>

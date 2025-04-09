@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { ITask } from '../../types/task'; // Импортируем типы
+import { ITask } from '../../types/task';
 
 // Асинхронное действие для получения задач
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {

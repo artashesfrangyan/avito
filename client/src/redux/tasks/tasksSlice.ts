@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice } from '@reduxjs/toolkit';
 import { ITask } from './types';
+import { createTaskAsync } from './tasksThunks';
 
 // Состояние задач
 export interface TasksState {
@@ -14,12 +14,6 @@ const initialState: TasksState = {
   status: 'idle',
   error: null,
 };
-
-// Асинхронное действие для создания задачи
-export const createTaskAsync = createAsyncThunk('tasks/createTask', async (task: ITask) => {
-  const response = await axios.post('http://localhost:8080/api/v1/tasks/create', task); // Отправляем задачу на сервер
-  return response.data;
-});
 
 // Редюсер для задач
 export const tasksSlice = createSlice({

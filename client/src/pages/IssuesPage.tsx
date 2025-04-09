@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectTasks } from '../redux/tasks/tasksSlice';
+import { fetchTasks, updateTaskAsync } from '../redux/tasks/tasksThunks';
 import { List, ListItem, ListItemText, Container, Grid, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { AppDispatch } from '../redux/store';
 import TaskForm from '../components/TaskForm';
-import { fetchTasks, updateTaskAsync } from '../redux/tasks/tasksThunks';
 import { ITask } from '../types/task';
+import { selectTasks } from '../redux/tasks/tasksSlice';
 
 // Компонент страницы всех задач
 const IssuesPage: React.FC = () => {
@@ -24,11 +24,7 @@ const IssuesPage: React.FC = () => {
     dispatch(fetchTasks());
   }, [dispatch]);
 
-  // Обработчик открытия попапа
-  const handleOpen = () => {
-    setOpen(true);
-  };
- // Обработчик закрытия попапа
+  // Обработчик закрытия попапа
   const handleClose = () => {
     setOpen(false);
   };
@@ -56,7 +52,7 @@ const IssuesPage: React.FC = () => {
   });
 
   return (
-    <Container maxWidth="lg" style={{backgroundColor: 'white'}}>
+    <Container maxWidth="lg" style={{ backgroundColor: '#f5f5f5', padding: '20px' }}> {/* Устанавливаем фон и отступы */}
       <Grid container spacing={2} style={{ marginTop: '20px' }}>
         <Grid item xs={12}>
           <TextField

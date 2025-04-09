@@ -1,12 +1,14 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import tasksReducer from './tasks/tasksSlice';
 import boardsReducer from './boards/boardsSlice';
+import usersReducer from './users/usersSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
 export const store = configureStore({
   reducer: {
     tasks: tasksReducer,
     boards: boardsReducer,
+    users: usersReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

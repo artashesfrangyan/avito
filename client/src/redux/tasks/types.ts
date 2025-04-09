@@ -4,7 +4,7 @@ export interface ITask {
   description: string;
   priority: 'Low' | 'Medium' | 'High';
   status: 'Backlog' | 'InProgress' | 'Done';
-  assignee: {
+  assignee?: {
     id: number;
     fullName: string;
     avatarUrl: string;
