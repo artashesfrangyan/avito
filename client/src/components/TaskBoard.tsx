@@ -49,7 +49,7 @@ const TaskBoard = () => {
 
     const taskId = active.id;
     const newStatus = over.data.current?.status as ITask['status'];
-    
+    console.log(over, active)
     dispatch(updateTaskStatusThunk(Number(taskId), newStatus));
   };
 
@@ -67,7 +67,7 @@ const TaskBoard = () => {
         setActiveTask(tasks.find(task => task.id === active.id) || null);
       }}
     >
-      <Grid container spacing={3} sx={{ p: 3, minHeight: '80vh' }}>
+      <Grid container spacing={3} sx={{ p: 3, minHeight: '80vh', gridTemplateColumns: 'repeat(3, 1fr)', flexWrap: 'nowrap' }}>
         {STATUSES.map(status => (
           <Grid item xs={12} md={4} key={status}>
             <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>

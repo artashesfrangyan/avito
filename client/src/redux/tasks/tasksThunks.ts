@@ -5,7 +5,7 @@ import { setLoading, setError, setTasks, updateTaskStatus } from './tasksSlice';
 export const fetchTasks = (): AppThunk => async dispatch => {
   try {
     dispatch(setLoading(true));
-    const response = await fetch('/api/v1/tasks');
+    const response = await fetch('http://localhost:8080/api/v1/tasks');
     const data = await response.json();
     dispatch(setTasks(data.data));
   } catch (err) {
@@ -23,8 +23,8 @@ export const updateTaskStatusThunk = (
 ): AppThunk => async dispatch => {
   try {
     dispatch(setLoading(true));
-    
-    const response = await fetch(`/api/v1/tasks/updateStatus/${taskId}`, {
+    console.log(newStatus)
+    const response = await fetch(`http://localhost:8080/api/v1/tasks/updateStatus/${taskId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
