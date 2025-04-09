@@ -25,7 +25,7 @@ export const usersSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.status = 'succeeded'; // Устанавливаем статус успеха
-        state.users.push(action.payload); // Добавляем новую задачу в список
+        state.users = action.payload; // Добавляем новую задачу в список
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.status = 'failed'; // Устанавливаем статус ошибки

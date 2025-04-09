@@ -25,7 +25,7 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onC
   useEffect(() => {
     dispatch(fetchUsers());
   }, [dispatch]);
-console.log(users.length)
+  
   // Обработчик отправки формы
   const handleSubmit = () => {
     dispatch(createTaskAsync({ assigneeId, boardId: selectedBoardId, description, priority, title, status })); // Отправляем задачу на сервер
