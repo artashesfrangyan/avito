@@ -16,4 +16,8 @@ export interface ITask {
   status: ITaskPriority;
   assignee: IAssignee;
   boardName: string;
+  board?: {
+    id: number;
+    name: string;
+  }
 }

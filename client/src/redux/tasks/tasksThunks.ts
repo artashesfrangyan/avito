@@ -5,7 +5,7 @@ import { ITask } from '../../types/task'; // Импортируем типы
 // Асинхронное действие для получения задач
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
   const response = await axios.get('http://localhost:8080/api/v1/tasks'); // Получаем задачи с сервера
-  return response.data;
+  return response.data.data;
 });
 
 // Асинхронное действие для создания задачи
