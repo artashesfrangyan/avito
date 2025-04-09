@@ -1,16 +1,15 @@
-import { Provider } from 'react-redux';
-import { store } from './redux/store';
-import TaskBoard from './components/TaskBoard';
-import { Container } from '@mui/material';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import BoardsPage from './pages/BoardsPage';
 
-const App = () => {
+const App: React.FC = () => {
   return (
-    <Provider store={store}>
-      <Container maxWidth="xl" sx={{ py: 3 }}>
-        <TaskBoard />
-      </Container>
-    </Provider>
+    <Router>
+      <Routes>
+        <Route path="/boards" element={<BoardsPage />} />
+      </Routes>
+    </Router>
   );
 };
+
 
 export default App;
