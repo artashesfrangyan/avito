@@ -1,45 +1,21 @@
-import { AppThunk } from '../store';
-import { ITask } from './types';
-import { setLoading, setError, setTasks, updateTaskStatus } from './tasksSlice';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { ITask } from '../../types/task'; // Импортируем типы
 
-export const fetchTasks = (): AppThunk => async dispatch => {
-  try {
-    dispatch(setLoading(true));
-    const response = await fetch('http://localhost:8080/api/v1/tasks');
-    const data = await response.json();
-    dispatch(setTasks(data.data));
-  } catch (err) {
-    if (err instanceof Error) {
-        dispatch(setError(err.message));
-    }
-  } finally {
-    dispatch(setLoading(false));
-  }
-};
+// Асинхронное действие для получения задач
+export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
+  const response = await axios.get('http://localhost:8080/api/v1/tasks'); // Получаем задачи с сервера
+  return response.data;
+});
 
-export const updateTaskStatusThunk = (
-  taskId: number,
-  newStatus: ITask['status']
-): AppThunk => async dispatch => {
-  try {
-    dispatch(setLoading(true));
-    console.log(newStatus)
-    const response = await fetch(`http://localhost:8080/api/v1/tasks/updateStatus/${taskId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ status: newStatus }),
-    });
+// Асинхронное действие для создания задачи
+export const createTaskAsync = createAsyncThunk('tasks/createTask', async (task: ITask) => {
+  const response = await axios.post('http://localhost:8080/api/v1/tasks/create', task); // Отправляем задачу на сервер
+  return response.data;
+});
 
-    if (!response.ok) throw new Error('Update failed');
-
-    dispatch(updateTaskStatus({ taskId, newStatus }));
-  } catch (err) {
-    if (err instanceof Error) {
-        dispatch(setError(err.message));
-    }
-  } finally {
-    dispatch(setLoading(false));
-  }
-};
+// Асинхронное действие для обновления задачи
+export const updateTaskAsync = createAsyncThunk('tasks/updateTask', async (task: ITask) => {
+  const response = await axios.put(`http://localhost:8080/api/v1/tasks/${task.id}`, task); // Обновляем задачу на сервере
+  return response.data;
+});
