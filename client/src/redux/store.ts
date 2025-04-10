@@ -25,9 +25,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActionPaths: ['payload.error'],
-      },
+      serializableCheck: false,
     })
 });
 

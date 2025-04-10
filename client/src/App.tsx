@@ -4,6 +4,7 @@ import Header from './components/Header';
 import TaskForm from './components/TaskForm'
 import { useState } from 'react';
 import IssuesPage from './pages/IssuesPage';
+import TaskBoard from './components/TaskBoard';
 
 const App: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -14,6 +15,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/boards" element={<BoardsPage />} />
         <Route path="/issues" element={<IssuesPage />} />
+        <Route path="board/:id" element={<TaskBoard />} />
       </Routes>
       <TaskForm open={open} onClose={() => setOpen(false)} />
     </Router>

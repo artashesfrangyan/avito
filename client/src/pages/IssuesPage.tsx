@@ -111,7 +111,7 @@ const IssuesPage: React.FC = () => {
       </Box>
       <List>
         {filteredTasks.map((task) => (
-          <ListItem key={task.id} onClick={() => navigate(`/boards/${task.id}`)}>
+          <ListItem key={task.id} onClick={() => navigate(`/board/${task.id}`)}>
           <ListItemText primary={task.title} />
         </ListItem>
         ))}

@@ -16,9 +16,9 @@ import {
 import { Grid, Card, CardContent, Typography, Box } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/store';
-import { fetchTasks, updateTaskStatusThunk } from '../redux/tasks/tasksThunks';
+import { fetchTasks, updateTaskAsync } from '../redux/tasks/tasksThunks';
 import TaskItem from './TaskItem';
-import { ITask } from '../redux/tasks/types';
+import { ITask } from '../types/task';
 
 const STATUSES: ITask['status'][] = ['Backlog', 'InProgress', 'Done'];
 const COLUMN_NAMES = {
@@ -43,15 +43,15 @@ const TaskBoard = () => {
     dispatch(fetchTasks());
   }, [dispatch]);
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over) return;
+  // const handleDragEnd = async (event: DragEndEvent) => {
+  //   const { active, over } = event;
+  //   if (!over) return;
 
-    const taskId = active.id;
-    const newStatus = over.data.current?.status as ITask['status'];
-    console.log(over, active)
-    dispatch(updateTaskStatusThunk(Number(taskId), newStatus));
-  };
+  //   const taskId = active.id;
+  //   const newStatus = over.data.current?.status as ITask['status'];
+  //   console.log(over, active)
+  //   dispatch(updateTaskAsync(Number(taskId), newStatus));
+  // };
 
   const tasksByStatus = tasks.reduce((acc, task) => {
     acc[task.status] = [...(acc[task.status] || []), task];
@@ -62,7 +62,7 @@ const TaskBoard = () => {
     <DndContext
       sensors={sensors}
       collisionDetection={closestCorners}
-      onDragEnd={handleDragEnd}
+      // onDragEnd={handleDragEnd}
       onDragStart={({ active }) => {
         setActiveTask(tasks.find(task => task.id === active.id) || null);
       }}
@@ -79,7 +79,7 @@ const TaskBoard = () => {
                   fontSize: '0.875rem',
                   letterSpacing: '0.5px'
                 }}>
-                  {COLUMN_NAMES[status]}
+                  {/* {COLUMN_NAMES[status]} */}
                 </Typography>
                 
                 <Box sx={{ 

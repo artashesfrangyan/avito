@@ -7,6 +7,7 @@ import { AppDispatch } from '../redux/store';
 const BoardsPage: React.FC = () => {
   const boards = useSelector(selectBoards); // Получаем доски из стора
   const dispatch = useDispatch<AppDispatch>(); // Получаем dispatch для отправки действий
+  
   React.useEffect(() => {
     dispatch(fetchBoardsAsync()); // Загружаем доски при монтировании компонента
   }, [dispatch]);
