@@ -1,5 +1,5 @@
 import { Card, CardContent, Typography, Chip, Stack } from '@mui/material';
-import { ITask } from '../types/task';
+import { ITask } from '../../types/task';
 
 const TaskItem = ({ task, isDragging = false }: { 
   task: ITask;
