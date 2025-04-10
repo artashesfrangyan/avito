@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchTasks, updateTaskAsync } from '../redux/tasks/tasksThunks';
-import { List, ListItem, ListItemText, Container, Grid, TextField, Select, MenuItem, FormControl, InputLabel, Box } from '@mui/material';
+import { List, ListItem, ListItemText, Container, TextField, Select, MenuItem, FormControl, InputLabel, Box } from '@mui/material';
 import { AppDispatch } from '../redux/store';
 import TaskForm from '../components/TaskForm';
 import { ITask } from '../types/task';
 import { selectTasks } from '../redux/tasks/tasksSlice';
 import { fetchBoardsAsync, selectBoards } from '../redux/boards/boardsSlice';
+import { useNavigate } from 'react-router-dom';
 
 // Компонент страницы всех задач
 const IssuesPage: React.FC = () => {
@@ -16,6 +17,8 @@ const IssuesPage: React.FC = () => {
   const [searchAssignee, setSearchAssignee] = useState(''); // Поиск по исполнителю
   const [filterStatus, setFilterStatus] = useState(''); // Фильтр по статусу задачи
   const [filterBoard, setFilterBoard] = useState(''); // Фильтр по доске
+
+  const navigate = useNavigate();
 
   const dispatch = useDispatch<AppDispatch>(); // Получаем dispatch для отправки действий
   const tasks = useSelector(selectTasks); // Получаем задачи из Redux
@@ -108,9 +111,9 @@ const IssuesPage: React.FC = () => {
       </Box>
       <List>
         {filteredTasks.map((task) => (
-          <ListItem key={task.id} onClick={() => handleTaskClick(task)}>
-            <ListItemText primary={task.title} />
-          </ListItem>
+          <ListItem key={task.id} onClick={() => navigate(`/boards/${task.id}`)}>
+          <ListItemText primary={task.title} />
+        </ListItem>
         ))}
       </List>
       <TaskForm open={open} onClose={handleClose} task={selectedTask} onUpdateTask={handleUpdateTask} />
