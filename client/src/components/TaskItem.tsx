@@ -1,5 +1,3 @@
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { Card, CardContent, Typography, Chip, Stack } from '@mui/material';
 import { ITask } from '../types/task';
 
@@ -7,21 +5,6 @@ const TaskItem = ({ task, isDragging = false }: {
   task: ITask;
   isDragging?: boolean;
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: task.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    cursor: 'grab',
-    marginBottom: 2,
-  };
 
   const priorityColors = {
     Low: 'success',
@@ -31,10 +14,6 @@ const TaskItem = ({ task, isDragging = false }: {
 
   return (
     <Card
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
       sx={{
         '&:hover': {
           boxShadow: 3,

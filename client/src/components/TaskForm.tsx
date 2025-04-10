@@ -145,7 +145,7 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onCl
             disabled={isUsersLoading}
             required
           >
-            {users.map((user) => {console.log(user); return (
+            {users.map((user) => (
               <MenuItem key={user.id} value={user.id}>
                 <Box display="flex" alignItems="center">
                   <ListItemAvatar>
@@ -159,7 +159,7 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onCl
                   />
                 </Box>
               </MenuItem>
-            )})}
+            ))}
           </Select>
         </FormControl>
       </DialogContent>

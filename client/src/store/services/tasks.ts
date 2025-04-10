@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { ITask } from '../../types/task';
+import { ITask, ITaskStatus } from '../../types/task';
 
 export const tasksApi = createApi({
   reducerPath: 'tasksApi',
@@ -32,12 +32,27 @@ export const tasksApi = createApi({
       }),
       invalidatesTags: ['Tasks'], // Обновляем список задач после изменения
     }),
-  }),
+
+    // Обновление статуса задачи
+    updateTaskStatus: builder.mutation<ITask, IUpdateStatus>({
+        query: ({id, status}) => ({
+            url: `/tasks/updateStatus/${id}`,
+            method: 'PUT',
+            body: {"status": status},
+        }),
+        invalidatesTags: ['Tasks'], // Обновляем список задач после обновления
+    }),
+}),
 });
+interface IUpdateStatus {
+  id: number
+  status: ITaskStatus
+}
 
 // Экспортируем автоматически сгенерированные хуки
 export const { 
   useGetTasksQuery, 
   useCreateTaskMutation, 
-  useUpdateTaskMutation 
+  useUpdateTaskMutation,
+  useUpdateTaskStatusMutation,
 } = tasksApi;
