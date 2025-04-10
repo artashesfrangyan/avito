@@ -15,8 +15,8 @@ import {
 } from '@dnd-kit/sortable';
 import { Grid, Card, CardContent, Typography, Box } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../redux/store';
-import { fetchTasks, updateTaskAsync } from '../redux/tasks/tasksThunks';
+import { useAppDispatch, useAppSelector } from '../store/store';
+import { fetchTasks, updateTaskAsync } from '../store/tasks/tasksThunks';
 import TaskItem from '../components/TaskItem';
 import { ITask } from '../types/task';
 

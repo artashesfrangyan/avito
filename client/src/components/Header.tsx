@@ -28,7 +28,7 @@ const Header: React.FC<{ onCreateTaskClick: () => void }> = ({ onCreateTaskClick
           style={{
             fontSize: '18px',
             textDecoration: 'none',
-            color: location.pathname.includes('/boards') ? 'red' : 'inherit',
+            color: location.pathname.includes('/board') ? 'red' : 'inherit',
           }}
         >
           Проекты

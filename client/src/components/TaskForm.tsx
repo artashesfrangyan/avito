@@ -1,37 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { createTaskAsync } from '../redux/tasks/tasksThunks';
-import { AppDispatch } from '../redux/store';
-import { fetchBoardsAsync, selectBoards } from '../redux/boards/boardsSlice';
-import { fetchUsers } from '../redux/users/usersApi';
-import { selectUsers } from '../redux/users/usersSlice';
+import { createTaskAsync } from '../store/tasks/tasksThunks';
+import { AppDispatch } from '../store/store';
+import { fetchBoardsAsync, selectBoards } from '../store/boards/boardsSlice';
+import { setFormData } from '../store/form/formSlice';
+import { useGetUsersQuery } from '../store/services/users';
 
 // Компонент формы для создания задачи
 const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onClose }) => {
-  const [title, setTitle] = useState(''); // Название задачи
-  const [description, setDescription] = useState(''); // Описание задачи
-  const [priority, setPriority] = useState('Medium'); // Приоритет задачи
-  const [status, setStatus] = useState('Backlog'); // Статус задачи
-  const [assigneeId, setAssigneeId] = useState(0); // Исполнитель задачи
-  const [selectedBoardId, setSelectedBoardId] = useState(0); // Выбранная доска
-
   const dispatch = useDispatch<AppDispatch>(); // Получаем dispatch для отправки действий
   
-  const users = useSelector(selectUsers); // Получаем доски из стора
-  // Получаем исполнителей с сервера
-  useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
+  const { data: users } = useGetUsersQuery();
 
   const boards = useSelector(selectBoards); // Получаем доски из стора
   React.useEffect(() => {
     dispatch(fetchBoardsAsync()); // Загружаем доски при монтировании компонента
   }, [dispatch]);
+
+  const formData = useSelector((state: { form: FormData }) => state.form); // Получаем данные формы из Redux
   
   // Обработчик отправки формы
   const handleSubmit = () => {
-    dispatch(createTaskAsync({ assigneeId, boardId: selectedBoardId, description, priority, title, status })); // Отправляем задачу на сервер
+    dispatch(createTaskAsync({ 
+      title: formData.title,
+      description: formData.description,
+      priority: formData.priority,
+      assigneeId: formData.assigneeId,
+      boardId: formData.boardId,
+    })); // Отправляем задачу на сервер
     onClose(); // Закрываем попап
   };
 
@@ -41,14 +38,14 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onC
       <DialogContent>
         <TextField
           label="Название"
-          value={title}
+          value={formData.title}
           onChange={(e) => setTitle(e.target.value)}
           fullWidth
           margin="normal"
         />
         <TextField
           label="Описание"
-          value={description}
+          value={formData.description}
           onChange={(e) => setDescription(e.target.value)}
           fullWidth
           margin="normal"
@@ -57,8 +54,8 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onC
           <InputLabel id="board-label">Проект</InputLabel>
           <Select
             labelId="board-label"
-            value={selectedBoardId}
-            onChange={(e) => setSelectedBoardId(Number(e.target.value))}
+            value={formData.boardId}
+            onChange={(e) => dispatch(setFormData({ boardId: Number(e.target.value) }))}
           >
             {boards.map((board) => (
               <MenuItem key={board.id} value={board.id}>
@@ -71,7 +68,7 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onC
           <InputLabel id="priority-label">Приоритет</InputLabel>
           <Select
             labelId="priority-label"
-            value={priority}
+            // value={priority}
             onChange={(e) => setPriority(e.target.value)}
           >
             <MenuItem value="Low">Низкий</MenuItem>
@@ -95,7 +92,7 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onC
           <InputLabel id="assignee-label">Исполнитель</InputLabel>
           <Select
             labelId="assignee-label"
-            value={assigneeId}
+            // value={assigneeId}
             onChange={(e) => setAssigneeId(Number(e.target.value))}
           >
             {Array.isArray(users) && users.map((user) => ( // Проверяем, что users является массивом

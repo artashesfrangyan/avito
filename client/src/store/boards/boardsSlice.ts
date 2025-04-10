@@ -1,15 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchBoards } from './boardsApi';
-
-export interface Board {
-  id: number;
-  name: string;
-  description: string;
-  taskCount: number;
-}
+import { IBoard } from '../../types/board';
 
 export interface BoardsState {
-  boards: Board[];
+  boards: IBoard[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }

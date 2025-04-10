@@ -1,11 +1,11 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import tasksReducer from './tasks/tasksSlice';
 import boardsReducer from './boards/boardsSlice';
-import usersReducer from './users/usersSlice';
 import formReducer from './form/formSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import { usersApi } from './services/users';
 
 // Настройка persistReducer для кэширования в LocalStorage
 const persistConfig = {
@@ -19,14 +19,11 @@ export const store = configureStore({
   reducer: {
     tasks: tasksReducer,
     boards: boardsReducer,
-    users: usersReducer,
+    [usersApi.reducerPath]: usersApi.reducer,
     form: persistedFormReducer
-
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-    })
+    getDefaultMiddleware({serializableCheck: false}).concat(usersApi.middleware),
 });
 
 // Настройка persistStore

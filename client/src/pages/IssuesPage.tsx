@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchTasks, updateTaskAsync } from '../redux/tasks/tasksThunks';
+import { fetchTasks, updateTaskAsync } from '../store/tasks/tasksThunks';
 import { List, ListItem, ListItemText, Container, TextField, Select, MenuItem, FormControl, InputLabel, Box } from '@mui/material';
-import { AppDispatch } from '../redux/store';
+import { AppDispatch } from '../store/store';
 import TaskForm from '../components/TaskForm';
 import { ITask } from '../types/task';
-import { selectTasks } from '../redux/tasks/tasksSlice';
-import { fetchBoardsAsync, selectBoards } from '../redux/boards/boardsSlice';
+import { selectTasks } from '../store/tasks/tasksSlice';
+import { fetchBoardsAsync, selectBoards } from '../store/boards/boardsSlice';
 import { useNavigate } from 'react-router-dom';
 
 // Компонент страницы всех задач
