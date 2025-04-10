@@ -16,7 +16,7 @@ import {
 import { Grid, Card, CardContent, Typography, Box } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/store';
-import { fetchTasks, updateTaskAsync } from '../store/tasks/tasksThunks';
+// import { fetchTasks, updateTaskAsync } from '../store/tasks/tasksThunks';
 import TaskItem from '../components/TaskItem';
 import { ITask } from '../types/task';
 

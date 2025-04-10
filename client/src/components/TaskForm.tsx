@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
 import { useGetUsersQuery } from '../store/services/users';
 import { useGetBoardsQuery } from '../store/services/boards';
 import { IFormData } from '../types/form';
@@ -145,11 +145,21 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onCl
             disabled={isUsersLoading}
             required
           >
-            {users.map((user) => (
+            {users.map((user) => {console.log(user); return (
               <MenuItem key={user.id} value={user.id}>
-                {user.fullName}
+                <Box display="flex" alignItems="center">
+                  <ListItemAvatar>
+                    <Avatar
+                      src={user.avatarUrl} 
+                      sx={{ width: 32, height: 32 }}
+                    />
+                  </ListItemAvatar>
+                  <ListItemText 
+                    primary={user.fullName}
+                  />
+                </Box>
               </MenuItem>
-            ))}
+            )})}
           </Select>
         </FormControl>
       </DialogContent>
