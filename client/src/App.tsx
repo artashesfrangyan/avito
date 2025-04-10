@@ -4,7 +4,7 @@ import Header from './components/Header';
 import TaskForm from './components/TaskForm'
 import { useState } from 'react';
 import IssuesPage from './pages/IssuesPage';
-import TaskBoard from './components/TaskBoard';
+import TaskBoard from './pages/BoardPage';
 
 const App: React.FC = () => {
   const [open, setOpen] = useState(false);
