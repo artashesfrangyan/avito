@@ -6,6 +6,6 @@ export interface IFormData {
     description: string;
     priority: ITaskPriority;
     status: ITaskStatus;
-    assigneeId: number;
-    boardId: number;
+    assigneeId: number | null;
+    boardId: number | null;
 }

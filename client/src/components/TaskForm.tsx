@@ -1,38 +1,34 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { useGetUsersQuery } from '../store/services/users';
 import { useGetBoardsQuery } from '../store/services/boards';
 import { IFormData } from '../types/form';
+import { useCreateTaskMutation } from '../store/services/tasks';
 
 // Ключ для сохранения в localStorage
 const FORM_STORAGE_KEY = 'unsaved_task_form_data';
+
+const blankForm: IFormData = {
+  title: '',
+  description: '',
+  priority: null,
+  assigneeId: null,
+  boardId: null,
+  status: null
+}
 
 const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
   // Загрузка сохраненных данных из localStorage при инициализации
   const loadSavedFormData = (): IFormData => {
     try {
       const savedData = localStorage.getItem(FORM_STORAGE_KEY);
-      return savedData ? JSON.parse(savedData) : {
-        title: '',
-        description: '',
-        priority: 'Medium',
-        assigneeId: null,
-        boardId: null,
-        status: 'Backlog'
-      };
+      return savedData ? JSON.parse(savedData) : blankForm;
     } catch {
-      return {
-        title: '',
-        description: '',
-        priority: 'Medium',
-        assigneeId: null,
-        boardId: null,
-        status: 'Backlog'
-      };
+      return blankForm
     }
   };
 
-  const [formValues, setFormValues] = useState<TaskFormValues>(loadSavedFormData);
+  const [formValues, setFormValues] = useState<IFormData>(loadSavedFormData);
 
   // Сохранение данных формы в localStorage при каждом изменении
   useEffect(() => {
@@ -43,7 +39,7 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onCl
   const { data: users = [], isLoading: isUsersLoading } = useGetUsersQuery();
   const { data: boards = [], isLoading: isBoardsLoading } = useGetBoardsQuery();
 
-  const handleChange = (field: keyof TaskFormValues) => (e: React.ChangeEvent<{ value: unknown }>) => {
+  const handleChange = (field: keyof IFormData) => (e: React.ChangeEvent<{ value: unknown }>) => {
     setFormValues(prev => ({
       ...prev,
       [field]: e.target.value
@@ -72,12 +68,11 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onCl
   };
 
   const handleClose = () => {
-    // Можно добавить подтверждение перед закрытием, если форма заполнена
     onClose();
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={() => {setFormValues(blankForm); localStorage.removeItem(FORM_STORAGE_KEY); handleClose()}}>
       <DialogTitle>Создание задачи</DialogTitle>
       <DialogContent>
         <TextField

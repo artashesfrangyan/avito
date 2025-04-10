@@ -1,17 +1,17 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import tasksReducer from './tasks/tasksSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { usersApi } from './services/users';
 import { boardsApi } from './services/boards';
+import { tasksApi } from './services/tasks';
 
 export const store = configureStore({
   reducer: {
-    tasks: tasksReducer,
+    [tasksApi.reducerPath]: tasksApi.reducer,
     [boardsApi.reducerPath]: boardsApi.reducer,
     [usersApi.reducerPath]: usersApi.reducer
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({serializableCheck: false}).concat(boardsApi.middleware, usersApi.middleware),
+    getDefaultMiddleware({serializableCheck: false}).concat(tasksApi.middleware, boardsApi.middleware, usersApi.middleware),
 });
 
 // Типы для работы с хранилищем

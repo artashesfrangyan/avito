@@ -1,65 +1,97 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchTasks, updateTaskAsync } from '../store/tasks/tasksThunks';
-import { List, ListItem, ListItemText, Container, TextField, Select, MenuItem, FormControl, InputLabel, Box } from '@mui/material';
-import { AppDispatch } from '../store/store';
+import { 
+  List, 
+  ListItem, 
+  ListItemText, 
+  Container, 
+  TextField, 
+  Select, 
+  MenuItem, 
+  FormControl, 
+  InputLabel, 
+  Box,
+  CircularProgress,
+  Alert
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useGetTasksQuery, useUpdateTaskMutation } from '../store/services/tasks';
 import TaskForm from '../components/TaskForm';
 import { ITask } from '../types/task';
-import { selectTasks } from '../store/tasks/tasksSlice';
-import { useNavigate } from 'react-router-dom';
 import { useGetBoardsQuery } from '../store/services/boards';
 
 // Компонент страницы всех задач
 const IssuesPage: React.FC = () => {
-  const [open, setOpen] = useState(false); // Состояние попапа
-  const [selectedTask, setSelectedTask] = useState<ITask | null>(null); // Выбранная задача
-  const [searchTitle, setSearchTitle] = useState(''); // Поиск по названию задачи
-  const [searchAssignee, setSearchAssignee] = useState(''); // Поиск по исполнителю
-  const [filterStatus, setFilterStatus] = useState(''); // Фильтр по статусу задачи
-  const [filterBoard, setFilterBoard] = useState(''); // Фильтр по доске
+  const [open, setOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
+  const [searchTitle, setSearchTitle] = useState('');
+  const [searchAssignee, setSearchAssignee] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterBoard, setFilterBoard] = useState('');
 
   const navigate = useNavigate();
 
-  const dispatch = useDispatch<AppDispatch>(); // Получаем dispatch для отправки действий
-  const tasks = useSelector(selectTasks); // Получаем задачи из Redux
-  React.useEffect(() => {
-    dispatch(fetchTasks()); // Загружаем задачи при монтировании компонента
-  }, [dispatch]);
+  const { data: boards = [] } = useGetBoardsQuery();
 
-  // Получаем задачи с сервера
-  React.useEffect(() => {
-    dispatch(fetchTasks());
-  }, [dispatch]);
+  // Получаем данные с помощью RTK Query
+  const { 
+    data: tasks, 
+    isLoading: isTasksLoading, 
+    isError: isTasksError, 
+    error: tasksError 
+  } = useGetTasksQuery();
 
-  const { data: boards} = useGetBoardsQuery();
+  const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
 
-  // Обработчик закрытия попапа
   const handleClose = () => {
     setOpen(false);
+    setSelectedTask(null);
   };
 
-  // Обработчик открытия задачи
-  const handleTaskClick = (task: ITask) => {
-    setSelectedTask(task);
-    setOpen(true);
+  const handleUpdateTask = async (updatedTask: ITask) => {
+    try {
+      await updateTask(updatedTask).unwrap();
+      handleClose();
+    } catch (error) {
+      console.error('Failed to update task:', error);
+    }
   };
 
-  // Обработчик обновления задачи
-  const handleUpdateTask = (updatedTask: ITask) => {
-    dispatch(updateTaskAsync(updatedTask)); // Обновляем задачу на сервере
-    handleClose(); // Закрываем попап
+  // Функция для фильтрации задач
+  const getFilteredTasks = () => {
+    if (!tasks) return [];
+    
+    return tasks.filter((task) => {
+      const matchesTitle = task.title.toLowerCase().includes(searchTitle.toLowerCase());
+      const matchesAssignee = task.assignee?.fullName.toLowerCase().includes(searchAssignee.toLowerCase()) ?? false;
+      const matchesStatus = filterStatus === '' || task.status === filterStatus;
+      const matchesBoard = filterBoard === '' || task.boardName === filterBoard;
+      
+      return matchesTitle && matchesAssignee && matchesStatus && matchesBoard;
+    });
   };
 
-  // Фильтрация задач
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasks = getFilteredTasks();
+
+  if (isTasksLoading) {
     return (
-      (searchTitle === '' || task.title.toLowerCase().includes(searchTitle.toLowerCase())) &&
-      (searchAssignee === '' || task?.assignee?.fullName.toLowerCase().includes(searchAssignee.toLowerCase())) &&
-      (filterStatus === '' || task.status === filterStatus) &&
-      (filterBoard === '' || task.boardName === filterBoard)
+      <Container maxWidth="lg" style={{ padding: '20px', textAlign: 'center' }}>
+        <CircularProgress />
+      </Container>
     );
-  });
-  
+  }
+
+  if (isTasksError) {
+    return (
+      <Container maxWidth="lg" style={{ padding: '20px' }}>
+        <Alert severity="error">
+          {isTasksError ? 
+            `Error loading tasks: ${tasksError?.toString()}` : 
+            'Error loading boards'}
+        </Alert>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="lg" style={{ padding: '20px' }}>
       <Box display="flex" gap={2} style={{ marginTop: '20px' }}>
@@ -82,7 +114,8 @@ const IssuesPage: React.FC = () => {
           <Select
             labelId="status-label"
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => setFilterStatus(e.target.value as string)}
+            label="Фильтр по статусу"
           >
             <MenuItem value="">Все</MenuItem>
             <MenuItem value="Backlog">Backlog</MenuItem>
@@ -95,10 +128,11 @@ const IssuesPage: React.FC = () => {
           <Select
             labelId="board-label"
             value={filterBoard}
-            onChange={(e) => setFilterBoard(e.target.value)}
+            onChange={(e) => setFilterBoard(e.target.value as string)}
+            label="Фильтр по доске"
           >
             <MenuItem value="">Все</MenuItem>
-            {boards?.map(({name, id}) => (
+            {boards?.map(({ name, id }) => (
               <MenuItem key={id} value={name}>
                 {name}
               </MenuItem>
@@ -106,14 +140,38 @@ const IssuesPage: React.FC = () => {
           </Select>
         </FormControl>
       </Box>
+
       <List>
-        {filteredTasks.map((task) => (
-          <ListItem key={task.id} onClick={() => navigate(`/board/${task.id}`)}>
-          <ListItemText primary={task.title} />
-        </ListItem>
-        ))}
+        {filteredTasks.length > 0 ? (
+          filteredTasks.map((task) => (
+            <ListItem 
+              key={task.id} 
+              onClick={() => navigate(`/board/${task.id}`)}
+              sx={{
+                cursor: 'pointer',
+                '&:hover': { backgroundColor: 'action.hover' }
+              }}
+            >
+              <ListItemText 
+                primary={task.title} 
+                secondary={`Status: ${task.status} • Исполнитель: ${task.assignee?.fullName || 'не назначен'}`}
+              />
+            </ListItem>
+          ))
+        ) : (
+          <ListItem>
+            <ListItemText primary="No tasks found" />
+          </ListItem>
+        )}
       </List>
-      <TaskForm open={open} onClose={handleClose} task={selectedTask} onUpdateTask={handleUpdateTask} />
+
+      <TaskForm 
+        open={open} 
+        onClose={handleClose} 
+        task={selectedTask} 
+        onUpdateTask={handleUpdateTask} 
+        isSubmitting={isUpdating}
+      />
     </Container>
   );
 };
