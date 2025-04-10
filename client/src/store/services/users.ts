@@ -11,10 +11,8 @@ export const usersApi = createApi({
       query: () => '/users',
       transformResponse: (response: { data: IUser[] }) => response.data, // Трансформируем ответ, чтобы получить data
       providesTags: ['Users'], // Указываем, что этот endpoint предоставляет тег 'Users'
-    }),
-    // Можно добавить другие endpoints для создания/обновления пользователей
+    })
   }),
 });
 
-// Экспортируем автоматически сгенерированные хуки
 export const { useGetUsersQuery } = usersApi;

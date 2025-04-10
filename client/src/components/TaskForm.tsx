@@ -1,61 +1,111 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-import { createTaskAsync } from '../store/tasks/tasksThunks';
-import { AppDispatch } from '../store/store';
-import { fetchBoardsAsync, selectBoards } from '../store/boards/boardsSlice';
-import { setFormData } from '../store/form/formSlice';
 import { useGetUsersQuery } from '../store/services/users';
+import { useGetBoardsQuery } from '../store/services/boards';
+import { IFormData } from '../types/form';
 
-// Компонент формы для создания задачи
-const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onClose }) => {
-  const dispatch = useDispatch<AppDispatch>(); // Получаем dispatch для отправки действий
-  
-  const { data: users } = useGetUsersQuery();
+// Ключ для сохранения в localStorage
+const FORM_STORAGE_KEY = 'unsaved_task_form_data';
 
-  const boards = useSelector(selectBoards); // Получаем доски из стора
-  React.useEffect(() => {
-    dispatch(fetchBoardsAsync()); // Загружаем доски при монтировании компонента
-  }, [dispatch]);
+const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
+  // Загрузка сохраненных данных из localStorage при инициализации
+  const loadSavedFormData = (): IFormData => {
+    try {
+      const savedData = localStorage.getItem(FORM_STORAGE_KEY);
+      return savedData ? JSON.parse(savedData) : {
+        title: '',
+        description: '',
+        priority: 'Medium',
+        assigneeId: null,
+        boardId: null,
+        status: 'Backlog'
+      };
+    } catch {
+      return {
+        title: '',
+        description: '',
+        priority: 'Medium',
+        assigneeId: null,
+        boardId: null,
+        status: 'Backlog'
+      };
+    }
+  };
 
-  const formData = useSelector((state: { form: FormData }) => state.form); // Получаем данные формы из Redux
-  
-  // Обработчик отправки формы
-  const handleSubmit = () => {
-    dispatch(createTaskAsync({ 
-      title: formData.title,
-      description: formData.description,
-      priority: formData.priority,
-      assigneeId: formData.assigneeId,
-      boardId: formData.boardId,
-    })); // Отправляем задачу на сервер
-    onClose(); // Закрываем попап
+  const [formValues, setFormValues] = useState<TaskFormValues>(loadSavedFormData);
+
+  // Сохранение данных формы в localStorage при каждом изменении
+  useEffect(() => {
+    localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formValues));
+  }, [formValues]);
+
+  const [createTask, { isLoading }] = useCreateTaskMutation();
+  const { data: users = [], isLoading: isUsersLoading } = useGetUsersQuery();
+  const { data: boards = [], isLoading: isBoardsLoading } = useGetBoardsQuery();
+
+  const handleChange = (field: keyof TaskFormValues) => (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormValues(prev => ({
+      ...prev,
+      [field]: e.target.value
+    }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (!formValues.boardId || !formValues.assigneeId) return;
+      
+      await createTask({
+        title: formValues.title,
+        description: formValues.description,
+        priority: formValues.priority,
+        assigneeId: formValues.assigneeId,
+        boardId: formValues.boardId,
+        status: formValues.status
+      }).unwrap();
+      
+      // Очищаем сохраненные данные при успешной отправке
+      localStorage.removeItem(FORM_STORAGE_KEY);
+      onClose();
+    } catch (error) {
+      console.error('Ошибка при создании задачи:', error);
+    }
+  };
+
+  const handleClose = () => {
+    // Можно добавить подтверждение перед закрытием, если форма заполнена
+    onClose();
   };
 
   return (
-    <Dialog open={open} onClose={onClose}> {/* Попап для создания задачи */}
+    <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Создание задачи</DialogTitle>
       <DialogContent>
         <TextField
           label="Название"
-          value={formData.title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={formValues.title}
+          onChange={handleChange('title')}
           fullWidth
           margin="normal"
+          required
         />
         <TextField
           label="Описание"
-          value={formData.description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={formValues.description}
+          onChange={handleChange('description')}
           fullWidth
           margin="normal"
+          multiline
+          rows={4}
         />
+        
         <FormControl fullWidth margin="normal">
-          <InputLabel id="board-label">Проект</InputLabel>
+          <InputLabel id="board-label">Проект *</InputLabel>
           <Select
             labelId="board-label"
-            value={formData.boardId}
-            onChange={(e) => dispatch(setFormData({ boardId: Number(e.target.value) }))}
+            value={formValues.boardId ?? ''}
+            onChange={handleChange('boardId')}
+            disabled={isBoardsLoading}
+            required
           >
             {boards.map((board) => (
               <MenuItem key={board.id} value={board.id}>
@@ -64,38 +114,43 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onC
             ))}
           </Select>
         </FormControl>
+
         <FormControl fullWidth margin="normal">
           <InputLabel id="priority-label">Приоритет</InputLabel>
           <Select
             labelId="priority-label"
-            // value={priority}
-            onChange={(e) => setPriority(e.target.value)}
+            value={formValues.priority}
+            onChange={handleChange('priority')}
           >
             <MenuItem value="Low">Низкий</MenuItem>
             <MenuItem value="Medium">Средний</MenuItem>
             <MenuItem value="High">Высокий</MenuItem>
           </Select>
         </FormControl>
+
         <FormControl fullWidth margin="normal">
           <InputLabel id="status-label">Статус</InputLabel>
           <Select
             labelId="status-label"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            value={formValues.status}
+            onChange={handleChange('status')}
           >
             <MenuItem value="Backlog">Backlog</MenuItem>
             <MenuItem value="InProgress">In Progress</MenuItem>
             <MenuItem value="Done">Done</MenuItem>
           </Select>
         </FormControl>
+
         <FormControl fullWidth margin="normal">
-          <InputLabel id="assignee-label">Исполнитель</InputLabel>
+          <InputLabel id="assignee-label">Исполнитель *</InputLabel>
           <Select
             labelId="assignee-label"
-            // value={assigneeId}
-            onChange={(e) => setAssigneeId(Number(e.target.value))}
+            value={formValues.assigneeId ?? ''}
+            onChange={handleChange('assigneeId')}
+            disabled={isUsersLoading}
+            required
           >
-            {Array.isArray(users) && users.map((user) => ( // Проверяем, что users является массивом
+            {users.map((user) => (
               <MenuItem key={user.id} value={user.id}>
                 {user.fullName}
               </MenuItem>
@@ -103,9 +158,17 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void; }> = ({ open, onC
           </Select>
         </FormControl>
       </DialogContent>
+      
       <DialogActions>
-        <Button onClick={onClose}>Отмена</Button>
-        <Button onClick={handleSubmit}>Создать</Button>
+        <Button onClick={handleClose}>Отмена</Button>
+        <Button 
+          onClick={handleSubmit} 
+          disabled={isLoading || !formValues.title || !formValues.boardId || !formValues.assigneeId}
+          variant="contained"
+          color="primary"
+        >
+          {isLoading ? 'Создание...' : 'Создать'}
+        </Button>
       </DialogActions>
     </Dialog>
   );

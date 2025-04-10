@@ -6,8 +6,8 @@ import { AppDispatch } from '../store/store';
 import TaskForm from '../components/TaskForm';
 import { ITask } from '../types/task';
 import { selectTasks } from '../store/tasks/tasksSlice';
-import { fetchBoardsAsync, selectBoards } from '../store/boards/boardsSlice';
 import { useNavigate } from 'react-router-dom';
+import { useGetBoardsQuery } from '../store/services/boards';
 
 // Компонент страницы всех задач
 const IssuesPage: React.FC = () => {
@@ -31,10 +31,7 @@ const IssuesPage: React.FC = () => {
     dispatch(fetchTasks());
   }, [dispatch]);
 
-  const boards = useSelector(selectBoards); // Получаем доски из стора
-  React.useEffect(() => {
-    dispatch(fetchBoardsAsync()); // Загружаем доски при монтировании компонента
-  }, [dispatch]);
+  const { data: boards} = useGetBoardsQuery();
 
   // Обработчик закрытия попапа
   const handleClose = () => {
@@ -101,7 +98,7 @@ const IssuesPage: React.FC = () => {
             onChange={(e) => setFilterBoard(e.target.value)}
           >
             <MenuItem value="">Все</MenuItem>
-            {boards.map(({name, id}) => (
+            {boards?.map(({name, id}) => (
               <MenuItem key={id} value={name}>
                 {name}
               </MenuItem>
