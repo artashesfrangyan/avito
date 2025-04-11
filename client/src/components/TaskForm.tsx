@@ -5,6 +5,7 @@ import { useGetBoardsQuery } from '../store/services/boards';
 import { IFormData } from '../types/form';
 import { useCreateTaskMutation, useUpdateTaskMutation } from '../store/services/tasks';
 import { ITask } from '../types/task';
+import { useBoardContext } from '../hooks/useBoardContext';
 
 // Ключ для сохранения в localStorage
 const FORM_STORAGE_KEY = 'unsaved_task_form_data';
@@ -17,14 +18,18 @@ const blankForm: Partial<ITask> = {
   boardId: undefined,
   status: undefined
 }
-
 interface Props extends DialogProps {
-  task: Partial<ITask> | null;
+  task: Partial<ITask> | null
 }
 
-const TaskForm: React.FC<Props> = ({ task, onClose, project, ...props }) => {
+const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
+  const { boardId } = useBoardContext();
+  console.log(boardId)
   // Загрузка сохраненных данных из localStorage при инициализации
   const loadSavedFormData = (): Partial<ITask> => {
+    if (boardId) {
+      return { ...blankForm, boardId: boardId}
+    }
     try {
       const savedData = localStorage.getItem(FORM_STORAGE_KEY);
       return savedData ? JSON.parse(savedData) : blankForm;
@@ -33,11 +38,9 @@ const TaskForm: React.FC<Props> = ({ task, onClose, project, ...props }) => {
     }
   };
 
-  const [formValues, setFormValues] = useState<Partial<ITask>>(task ? {
-    ...task, assigneeId: task.assignee?.id
-  } : project ? {
-    ...blankForm, boardId: project
-  } : loadSavedFormData);
+  const [formValues, setFormValues] = useState<Partial<ITask>>(
+    task ? { ...task, assigneeId: task.assignee?.id }
+    : loadSavedFormData);
 
   // Сохранение данных формы в localStorage при каждом изменении
   useEffect(() => {
@@ -111,7 +114,7 @@ const TaskForm: React.FC<Props> = ({ task, onClose, project, ...props }) => {
             labelId="board-label"
             value={formValues.boardId ?? ''}
             onChange={handleChange('boardId')}
-            disabled={isBoardsLoading}
+            disabled={isBoardsLoading || !boardId} // Отключаем при загрузке или на странице проекта
             required
           >
             {boards.map((board) => (

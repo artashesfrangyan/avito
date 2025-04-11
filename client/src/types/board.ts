@@ -4,3 +4,8 @@ export interface IBoard {
     description: string;
     taskCount: number;
 }
+
+export interface IBoardContext {
+    boardId: number;
+    setBoardId: (id: number) => void;
+};

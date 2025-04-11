@@ -6,7 +6,6 @@ import IssuesPage from './pages/IssuesPage';
 import TaskBoard from './pages/BoardPage';
 
 const App: React.FC = () => {
-
   return (
     <Router>
       <Header />

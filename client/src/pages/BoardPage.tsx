@@ -8,6 +8,7 @@ import TaskColumn from '../components/TaskBoard/TaskColumn';
 import { useGetBoardsQuery, useGetBoardTasksQuery } from '../store/services/boards';
 import { useParams } from 'react-router-dom';
 import { IBoard } from '../types/board';
+import { useBoardContext } from '../hooks/useBoardContext';
 
 const STATUSES: ITask['status'][] = ['Backlog', 'InProgress', 'Done'];
 const COLUMN_NAMES = {
@@ -18,7 +19,8 @@ const COLUMN_NAMES = {
 
 const TaskBoard = () => {
   const { id } = useParams<{id: string}>();
-
+  const { setBoardId } = useBoardContext();
+  
   const { data: boardsData } = useGetBoardsQuery();
   const { data: tasks = [], isLoading, isError, refetch } = useGetBoardTasksQuery(id || '', {
     skip: !id // Пропустить запрос если нет id
@@ -27,8 +29,9 @@ const TaskBoard = () => {
 
   // Находим текущую доску по id
   const currentBoardName = useMemo(() => {
+    setBoardId(Number(id));
     return boardsData?.find((board: IBoard) => board.id === Number(id))?.name;
-  }, [boardsData, id])
+  }, [boardsData, id, setBoardId])
 
   // Маппинг статусов
   const statusMap = useMemo(() => {
