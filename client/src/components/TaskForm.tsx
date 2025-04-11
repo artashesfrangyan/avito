@@ -3,27 +3,28 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, S
 import { useGetUsersQuery } from '../store/services/users';
 import { useGetBoardsQuery } from '../store/services/boards';
 import { IFormData } from '../types/form';
-import { useCreateTaskMutation } from '../store/services/tasks';
+import { useCreateTaskMutation, useUpdateTaskMutation } from '../store/services/tasks';
+import { ITask } from '../types/task';
 
 // Ключ для сохранения в localStorage
 const FORM_STORAGE_KEY = 'unsaved_task_form_data';
 
-const blankForm: IFormData = {
+const blankForm: Partial<ITask> = {
   title: '',
   description: '',
   priority: null,
-  assigneeId: null,
-  boardId: null,
+  assigneeId: undefined,
+  boardId: undefined,
   status: null
 }
 
 interface Props extends DialogProps {
-  task?: IFormData
+  task: Partial<ITask> | null;
 }
 
 const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
   // Загрузка сохраненных данных из localStorage при инициализации
-  const loadSavedFormData = (): IFormData => {
+  const loadSavedFormData = (): Partial<ITask> => {
     try {
       const savedData = localStorage.getItem(FORM_STORAGE_KEY);
       return savedData ? JSON.parse(savedData) : blankForm;
@@ -32,7 +33,7 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
     }
   };
 
-  const [formValues, setFormValues] = useState<IFormData>(task ?? loadSavedFormData);
+  const [formValues, setFormValues] = useState<Partial<ITask>>(task ?? loadSavedFormData);
 
   // Сохранение данных формы в localStorage при каждом изменении
   useEffect(() => {
@@ -40,6 +41,7 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
   }, [formValues]);
 
   const [createTask, { isLoading }] = useCreateTaskMutation();
+  const [updateTask] = useUpdateTaskMutation();
   const { data: users = [], isLoading: isUsersLoading } = useGetUsersQuery();
   const { data: boards = [], isLoading: isBoardsLoading } = useGetBoardsQuery();
 
@@ -54,14 +56,11 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
     try {
       if (!formValues.boardId || !formValues.assigneeId) return;
       
-      await createTask({
-        title: formValues.title,
-        description: formValues.description,
-        priority: formValues.priority,
-        assigneeId: formValues.assigneeId,
-        boardId: formValues.boardId,
-        status: formValues.status
-      }).unwrap();
+      if (task) {
+        await updateTask(formValues)
+      } else {
+        await createTask(formValues).unwrap();
+      }
       
       // Очищаем сохраненные данные при успешной отправке
       localStorage.removeItem(FORM_STORAGE_KEY);
@@ -120,7 +119,7 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
           <InputLabel id="priority-label">Приоритет</InputLabel>
           <Select
             labelId="priority-label"
-            value={formValues.priority}
+            value={formValues.priority || ''}
             onChange={handleChange('priority')}
           >
             <MenuItem value="Low">Низкий</MenuItem>
@@ -133,7 +132,7 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
           <InputLabel id="status-label">Статус</InputLabel>
           <Select
             labelId="status-label"
-            value={formValues.status}
+            value={formValues.status || ''}
             onChange={handleChange('status')}
           >
             <MenuItem value="Backlog">Backlog</MenuItem>

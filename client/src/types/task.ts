@@ -16,8 +16,6 @@ export interface ITask {
   status: ITaskStatus;
   assignee: IAssignee;
   boardName: string;
-  board?: {
-    id: number;
-    name: string;
-  }
+  boardId: number;
+  assigneeId: number;
 }

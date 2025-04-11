@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useGetTasksQuery, useUpdateTaskStatusMutation } from '../store/services/tasks';
 import { ITask } from '../types/task';
 import TaskColumn from '../components/TaskBoard/TaskColumn';
+import { useGetTasksWithBoards } from '../hooks/useGetTasksWithBoards';
 
 const STATUSES: ITask['status'][] = ['Backlog', 'InProgress', 'Done'];
 const COLUMN_NAMES = {
@@ -14,7 +15,7 @@ const COLUMN_NAMES = {
 };
 
 const TaskBoard = () => {
-  const { data: tasks = [], isLoading, isError } = useGetTasksQuery();
+  const { data: tasks = [], isLoading, isError } = useGetTasksWithBoards();
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
   const tasksByStatus = useCallback(() => {

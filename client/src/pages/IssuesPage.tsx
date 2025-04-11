@@ -14,18 +14,16 @@ import {
   Alert,
   Button
 } from '@mui/material';
-import { useGetTasksQuery } from '../store/services/tasks';
 import TaskForm from '../components/TaskForm';
-import { ITask, ITaskStatus } from '../types/task';
+import { ITaskStatus } from '../types/task';
 import { useGetBoardsQuery } from '../store/services/boards';
-import { useCreateTaskMutation, useUpdateTaskMutation } from '../store/services/tasks';
+import { useModal } from 'mui-modal-provider';
+import { useGetTasksWithBoards } from '../hooks/useGetTasksWithBoards';
 
 const IssuesPage: React.FC = () => {
-  const [open, setOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
   const [searchTitle, setSearchTitle] = useState('');
   const [searchAssignee, setSearchAssignee] = useState('');
-  const [filterStatus, setFilterStatus] = useState<ITaskStatus>('');
+  const [filterStatus, setFilterStatus] = useState<ITaskStatus>(null);
   const [filterBoard, setFilterBoard] = useState('');
 
   const { data: boards = [] } = useGetBoardsQuery();
@@ -33,32 +31,11 @@ const IssuesPage: React.FC = () => {
     data: tasks, 
     isLoading: isTasksLoading, 
     isError: isTasksError 
-  } = useGetTasksQuery();
-
-  const [updateTask] = useUpdateTaskMutation();
-  const [createTask] = useCreateTaskMutation();
-
+  } = useGetTasksWithBoards();
+console.log(tasks)
+  const { showModal } = useModal();
   const handleOpenCreate = () => {
-    setSelectedTask(null);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedTask(null);
-  };
-
-  const handleSubmit = async (taskData: any) => {
-    try {
-      if (taskData.id) {
-        await updateTask(taskData).unwrap();
-      } else {
-        await createTask(taskData).unwrap();
-      }
-      handleClose();
-    } catch (error) {
-      console.error('Ошибка при сохранении задачи:', error);
-    }
+    showModal(TaskForm)
   };
 
   const filteredTasks = tasks?.filter(task => {
@@ -139,8 +116,7 @@ const IssuesPage: React.FC = () => {
           <ListItem 
             key={task.id}
             onClick={() => {
-              setSelectedTask(task);
-              setOpen(true);
+              showModal(TaskForm, {task})
             }}
             sx={{
               cursor: 'pointer',
@@ -190,13 +166,6 @@ const IssuesPage: React.FC = () => {
           Создать задачу
         </Button>
       </Box>
-      <TaskForm
-        open={open}
-        onClose={handleClose}
-        task={selectedTask}
-        onSubmit={handleSubmit}
-        isSubmitting={false}
-      />
     </Container>
   );
 };

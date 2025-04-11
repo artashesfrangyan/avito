@@ -24,11 +24,17 @@ export const tasksApi = createApi({
     }),
     
     // Обновление задачи
-    updateTask: builder.mutation<ITask, ITask>({
+    updateTask: builder.mutation<ITask, Partial<ITask>>({
       query: (task) => ({
         url: `/tasks/${task.id}`,
         method: 'PUT',
-        body: task,
+        body: {
+          assigneeId: task.assigneeId, 
+          description: task.description,
+          priority: task.priority,
+          status: task.status,
+          title: task.title
+        },
       }),
       invalidatesTags: ['Tasks'], // Обновляем список задач после изменения
     }),
@@ -50,7 +56,7 @@ interface IUpdateStatus {
 }
 
 // Экспортируем автоматически сгенерированные хуки
-export const { 
+export const {
   useGetTasksQuery, 
   useCreateTaskMutation, 
   useUpdateTaskMutation,
