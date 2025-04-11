@@ -50,7 +50,7 @@ const TaskBoard = () => {
                   fontSize: '0.875rem',
                   letterSpacing: '0.5px',
                 }}>
-                  {COLUMN_NAMES[status]}
+                  {status && COLUMN_NAMES[status]}
                 </Typography>
                 <TaskColumn status={status} tasks={tasksByStatus()[status]} onDrop={handleDrop} />
               </CardContent>

@@ -1,9 +1,11 @@
 import React from 'react';
 import { Button, List, ListItem, ListItemText, Container, Box } from '@mui/material';
 import { useGetBoardsQuery } from '../store/services/boards';
+import { useNavigate } from 'react-router-dom';
 
 const BoardsPage: React.FC = () => {
-    const { data: boards } = useGetBoardsQuery();
+  const { data: boards } = useGetBoardsQuery();
+  const navigate = useNavigate();
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
@@ -12,7 +14,7 @@ const BoardsPage: React.FC = () => {
           {boards?.map((board) => (
             <ListItem key={board.id}>
               <ListItemText primary={board.name} />
-              <Button>Перейти к доске</Button>
+              <Button href={`/board/${board.id}`} onClick={() => navigate(`/board/${board.id}`)}>Перейти к доске</Button>
             </ListItem>
           ))}
         </List>
