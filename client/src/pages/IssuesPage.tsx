@@ -11,70 +11,68 @@ import {
   InputLabel, 
   Box,
   CircularProgress,
-  Alert
+  Alert,
+  Button
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { useGetTasksQuery, useUpdateTaskMutation } from '../store/services/tasks';
+import { useGetTasksQuery } from '../store/services/tasks';
 import TaskForm from '../components/TaskForm';
-import { ITask } from '../types/task';
+import { ITask, ITaskStatus } from '../types/task';
 import { useGetBoardsQuery } from '../store/services/boards';
+import { useCreateTaskMutation, useUpdateTaskMutation } from '../store/services/tasks';
 
-// Компонент страницы всех задач
 const IssuesPage: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
   const [searchTitle, setSearchTitle] = useState('');
   const [searchAssignee, setSearchAssignee] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
+  const [filterStatus, setFilterStatus] = useState<ITaskStatus>('');
   const [filterBoard, setFilterBoard] = useState('');
 
-  const navigate = useNavigate();
-
   const { data: boards = [] } = useGetBoardsQuery();
-
-  // Получаем данные с помощью RTK Query
   const { 
     data: tasks, 
     isLoading: isTasksLoading, 
-    isError: isTasksError, 
-    error: tasksError 
+    isError: isTasksError 
   } = useGetTasksQuery();
 
-  const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
+  const [updateTask] = useUpdateTaskMutation();
+  const [createTask] = useCreateTaskMutation();
+
+  const handleOpenCreate = () => {
+    setSelectedTask(null);
+    setOpen(true);
+  };
 
   const handleClose = () => {
     setOpen(false);
     setSelectedTask(null);
   };
 
-  const handleUpdateTask = async (updatedTask: ITask) => {
+  const handleSubmit = async (taskData: any) => {
     try {
-      await updateTask(updatedTask).unwrap();
+      if (taskData.id) {
+        await updateTask(taskData).unwrap();
+      } else {
+        await createTask(taskData).unwrap();
+      }
       handleClose();
     } catch (error) {
-      console.error('Failed to update task:', error);
+      console.error('Ошибка при сохранении задачи:', error);
     }
   };
 
-  // Функция для фильтрации задач
-  const getFilteredTasks = () => {
-    if (!tasks) return [];
+  const filteredTasks = tasks?.filter(task => {
+    const matchesTitle = task.title.toLowerCase().includes(searchTitle.toLowerCase());
+    const matchesAssignee = task.assignee.fullName.toLowerCase().includes(searchAssignee.toLowerCase());
+    const matchesStatus = filterStatus ? task.status === filterStatus : true;
+    const matchesBoard = filterBoard ? task.boardName === filterBoard : true;
     
-    return tasks.filter((task) => {
-      const matchesTitle = task.title.toLowerCase().includes(searchTitle.toLowerCase());
-      const matchesAssignee = task.assignee?.fullName.toLowerCase().includes(searchAssignee.toLowerCase()) ?? false;
-      const matchesStatus = filterStatus === '' || task.status === filterStatus;
-      const matchesBoard = filterBoard === '' || task.boardName === filterBoard;
-      
-      return matchesTitle && matchesAssignee && matchesStatus && matchesBoard;
-    });
-  };
-
-  const filteredTasks = getFilteredTasks();
+    return matchesTitle && matchesAssignee && matchesStatus && matchesBoard;
+  }) || [];
 
   if (isTasksLoading) {
     return (
-      <Container maxWidth="lg" style={{ padding: '20px', textAlign: 'center' }}>
+      <Container maxWidth="lg" sx={{ p: 3, textAlign: 'center' }}>
         <CircularProgress />
       </Container>
     );
@@ -82,40 +80,35 @@ const IssuesPage: React.FC = () => {
 
   if (isTasksError) {
     return (
-      <Container maxWidth="lg" style={{ padding: '20px' }}>
-        <Alert severity="error">
-          {isTasksError ? 
-            `Error loading tasks: ${tasksError?.toString()}` : 
-            'Error loading boards'}
-        </Alert>
+      <Container maxWidth="lg" sx={{ p: 3 }}>
+        <Alert severity="error">Ошибка загрузки задач</Alert>
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="lg" style={{ padding: '20px' }}>
-      <Box display="flex" gap={2} style={{ marginTop: '20px' }}>
+    <Container maxWidth="lg" sx={{ p: 3 }}>
+      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
         <TextField
-          label="Поиск по названию задачи"
+          label="Поиск по названию"
           value={searchTitle}
           onChange={(e) => setSearchTitle(e.target.value)}
-          fullWidth
-          margin="normal"
+          sx={{ flex: 1, minWidth: 200 }}
         />
+
         <TextField
           label="Поиск по исполнителю"
           value={searchAssignee}
           onChange={(e) => setSearchAssignee(e.target.value)}
-          fullWidth
-          margin="normal"
+          sx={{ flex: 1, minWidth: 200 }}
         />
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="status-label">Фильтр по статусу</InputLabel>
+
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel>Статус</InputLabel>
           <Select
-            labelId="status-label"
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as string)}
-            label="Фильтр по статусу"
+            onChange={(e) => setFilterStatus(e.target.value as ITaskStatus)}
+            label="Статус"
           >
             <MenuItem value="">Все</MenuItem>
             <MenuItem value="Backlog">Backlog</MenuItem>
@@ -123,55 +116,86 @@ const IssuesPage: React.FC = () => {
             <MenuItem value="Done">Done</MenuItem>
           </Select>
         </FormControl>
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="board-label">Фильтр по доске</InputLabel>
+
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel>Доска</InputLabel>
           <Select
-            labelId="board-label"
             value={filterBoard}
-            onChange={(e) => setFilterBoard(e.target.value as string)}
-            label="Фильтр по доске"
+            onChange={(e) => setFilterBoard(e.target.value)}
+            label="Доска"
           >
             <MenuItem value="">Все</MenuItem>
-            {boards?.map(({ name, id }) => (
-              <MenuItem key={id} value={name}>
-                {name}
+            {boards.map((board) => (
+              <MenuItem key={board.id} value={board.name}>
+                {board.name}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
       </Box>
 
-      <List>
-        {filteredTasks.length > 0 ? (
-          filteredTasks.map((task) => (
-            <ListItem 
-              key={task.id} 
-              // onClick={() => navigate(`/board/${task.id}`)}
-              onClick={() => navigate(`/board/${task.id}`)}
-              sx={{
-                cursor: 'pointer',
-                '&:hover': { backgroundColor: 'action.hover' }
-              }}
-            >
-              <ListItemText 
-                primary={task.title} 
-                secondary={`Status: ${task.status} • Исполнитель: ${task.assignee?.fullName || 'не назначен'}`}
-              />
-            </ListItem>
-          ))
-        ) : (
-          <ListItem>
-            <ListItemText primary="No tasks found" />
+      <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
+        {filteredTasks.map((task) => (
+          <ListItem 
+            key={task.id}
+            onClick={() => {
+              setSelectedTask(task);
+              setOpen(true);
+            }}
+            sx={{
+              cursor: 'pointer',
+              '&:hover': { bgcolor: 'action.hover' },
+              borderBottom: '1px solid',
+              borderColor: 'divider'
+            }}
+          >
+            <ListItemText
+              primary={task.title}
+              secondary={
+                <>
+                  <Box component="span" sx={{ mr: 2 }}>
+                    Статус: {task.status}
+                  </Box>
+                  <Box component="span" sx={{ mr: 2 }}>
+                    Исполнитель: {task.assignee.fullName}
+                  </Box>
+                  <Box component="span">
+                    Проект: {task.boardName}
+                  </Box>
+                </>
+              }
+            />
           </ListItem>
-        )}
+        ))}
       </List>
-
-      <TaskForm 
-        open={open} 
-        onClose={handleClose} 
-        task={selectedTask} 
-        onUpdateTask={handleUpdateTask} 
-        isSubmitting={isUpdating}
+      <Box sx={{ 
+        mt: 3, 
+        display: 'flex', 
+        justifyContent: 'flex-end',
+        position: 'sticky',
+        bottom: 20,
+        zIndex: 1
+      }}>
+        <Button 
+          variant="contained" 
+          onClick={handleOpenCreate}
+          size="large"
+          sx={{
+            boxShadow: 3,
+            '&:hover': {
+              boxShadow: 5
+            }
+          }}
+        >
+          Создать задачу
+        </Button>
+      </Box>
+      <TaskForm
+        open={open}
+        onClose={handleClose}
+        task={selectedTask}
+        onSubmit={handleSubmit}
+        isSubmitting={false}
       />
     </Container>
   );
