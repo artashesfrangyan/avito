@@ -17,7 +17,7 @@ const blankForm: IFormData = {
   status: null
 }
 
-const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
+const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose, project, task }) => {
   // Загрузка сохраненных данных из localStorage при инициализации
   const loadSavedFormData = (): IFormData => {
     try {
@@ -29,6 +29,8 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onCl
   };
 
   const [formValues, setFormValues] = useState<IFormData>(loadSavedFormData);
+
+  console.log(formValues.boardId)
 
   // Сохранение данных формы в localStorage при каждом изменении
   useEffect(() => {
@@ -73,7 +75,7 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onCl
 
   return (
     <Dialog open={open} onClose={() => {setFormValues(blankForm); localStorage.removeItem(FORM_STORAGE_KEY); handleClose()}}>
-      <DialogTitle>Создание задачи</DialogTitle>
+      <DialogTitle>{task ? "Редактирование" : "Создание"} задачи</DialogTitle>
       <DialogContent>
         <TextField
           label="Название"

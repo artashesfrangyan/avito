@@ -39,8 +39,8 @@ const TaskBoard = () => {
     <DndProvider backend={HTML5Backend}>
       <Grid container spacing={3} sx={{ p: 3, minHeight: '80vh', flexWrap: 'nowrap', overflowX: 'auto' }}>
         {STATUSES.map((status) => (
-          <Grid item xs={12} md={4} key={status}>
-            <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column', minWidth: 300 }}>
+          <Grid size={{ xs: 12, md: 4 }} key={status}>
+            <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography variant="h6" gutterBottom sx={{ 
                   mb: 2,

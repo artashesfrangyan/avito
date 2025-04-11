@@ -1,5 +1,6 @@
 import { Card, CardContent, Typography, Chip, Stack } from '@mui/material';
 import { ITask } from '../../types/task';
+import { useCallback } from 'react';
 
 const TaskItem = ({ task, isDragging = false }: { 
   task: ITask;
@@ -12,6 +13,10 @@ const TaskItem = ({ task, isDragging = false }: {
     High: 'error'
   } as const;
 
+  const onClick = useCallback(() => {
+    
+  }, [])
+
   return (
     <Card
       sx={{
@@ -23,6 +28,7 @@ const TaskItem = ({ task, isDragging = false }: {
           transform: 'scale(1.02)',
         }),
       }}
+      onClick={onClick}
     >
       <CardContent>
         <Typography variant="subtitle1" gutterBottom>
