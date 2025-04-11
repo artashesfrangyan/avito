@@ -4,16 +4,19 @@ import Header from './components/Header';
 import React from 'react';
 import IssuesPage from './pages/IssuesPage';
 import TaskBoard from './pages/BoardPage';
+import ModalProvider from 'mui-modal-provider';
 
 const App: React.FC = () => {
   return (
     <Router>
-      <Header />
-      <Routes>
-        <Route path="/boards" element={<BoardsPage />} />
-        <Route path="/issues" element={<IssuesPage />} />
-        <Route path="board/:id" element={<TaskBoard />} />
-      </Routes>
+      <ModalProvider>
+        <Header />
+        <Routes>
+          <Route path="/boards" element={<BoardsPage />} />
+          <Route path="/issues" element={<IssuesPage />} />
+          <Route path="board/:id" element={<TaskBoard />} />
+        </Routes>
+      </ModalProvider>
     </Router>
   );
 };

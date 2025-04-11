@@ -6,6 +6,8 @@ import { IFormData } from '../types/form';
 import { useCreateTaskMutation, useUpdateTaskMutation } from '../store/services/tasks';
 import { ITask } from '../types/task';
 import { useBoardContext } from '../hooks/useBoardContext';
+import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 // Ключ для сохранения в localStorage
 const FORM_STORAGE_KEY = 'unsaved_task_form_data';
@@ -24,11 +26,12 @@ interface Props extends DialogProps {
 
 const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
   const { boardId } = useBoardContext();
+  const { pathname } = useLocation()
   console.log(boardId)
   // Загрузка сохраненных данных из localStorage при инициализации
   const loadSavedFormData = (): Partial<ITask> => {
     if (boardId) {
-      return { ...blankForm, boardId: boardId}
+      blankForm.boardId = boardId;
     }
     try {
       const savedData = localStorage.getItem(FORM_STORAGE_KEY);
@@ -38,8 +41,9 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
     }
   };
 
+  // Значения, с которыми будет работать форма
   const [formValues, setFormValues] = useState<Partial<ITask>>(
-    task ? { ...task, assigneeId: task.assignee?.id }
+    task ? { ...task, assigneeId: task.assignee?.id, boardId: (task.boardId || boardId) }
     : loadSavedFormData);
 
   // Сохранение данных формы в localStorage при каждом изменении
@@ -79,7 +83,7 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
       console.error('Ошибка при создании задачи:', error);
     }
   };
-
+  
   const handleClose = React.useCallback<Exclude<DialogProps['onClose'], undefined>>((...args) => {
     setFormValues(blankForm); 
     localStorage.removeItem(FORM_STORAGE_KEY); 
@@ -114,7 +118,7 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
             labelId="board-label"
             value={formValues.boardId ?? ''}
             onChange={handleChange('boardId')}
-            disabled={isBoardsLoading || !boardId} // Отключаем при загрузке или на странице проекта
+            disabled={isBoardsLoading || !!boardId} // Отключаем при загрузке или на странице проекта
             required
           >
             {boards.map((board) => (
@@ -180,6 +184,17 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
       </DialogContent>
       
       <DialogActions>
+        {pathname === '/issues' ? (
+          <Button
+            component={Link}
+            to={`/board/${formValues.boardId}`}
+            variant="outlined"
+            sx={{ mr: 'auto' }}
+            disabled={isLoading || !formValues.boardId}
+          >
+            Перейти на доску
+          </Button>
+        ) : ''}
         <Button 
           onClick={handleSubmit} 
           disabled={isLoading || !formValues.title || !formValues.boardId || !formValues.assigneeId}
