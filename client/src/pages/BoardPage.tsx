@@ -33,8 +33,8 @@ const TaskBoard = () => {
     }
   }, [updateTaskStatus]);
 
-  if (isLoading) return <div>Loading tasks...</div>;
-  if (isError) return <div>Error loading tasks</div>;
+  if (isLoading) return <div>Загрузка задач...</div>;
+  if (isError) return <div>Ошибка при загрузке задач</div>;
 
   return (
     <DndProvider backend={HTML5Backend}>
