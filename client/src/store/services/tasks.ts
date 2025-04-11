@@ -26,7 +26,7 @@ export const tasksApi = createApi({
     // Обновление задачи
     updateTask: builder.mutation<ITask, Partial<ITask>>({
       query: (task) => ({
-        url: `/tasks/${task.id}`,
+        url: `/tasks/update/${task.id}`,
         method: 'PUT',
         body: {
           assigneeId: task.assigneeId, 

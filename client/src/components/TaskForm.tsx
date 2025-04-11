@@ -33,7 +33,7 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
     }
   };
 
-  const [formValues, setFormValues] = useState<Partial<ITask>>(task ?? loadSavedFormData);
+  const [formValues, setFormValues] = useState<Partial<ITask>>(task ? {...task, assigneeId: task.assignee?.id} : loadSavedFormData);
 
   // Сохранение данных формы в localStorage при каждом изменении
   useEffect(() => {
@@ -177,7 +177,7 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
           variant="contained"
           color="primary"
         >
-          {isLoading ? 'Создание...' : 'Создать'}
+          {task ? 'Изменить' : 'Создать'}
         </Button>
       </DialogActions>
     </Dialog>
