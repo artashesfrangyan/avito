@@ -1,9 +1,12 @@
 import React from 'react';
 import { AppBar, Toolbar, Button, Box, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import TaskForm from './TaskForm';
+import { useModal } from 'mui-modal-provider';
 
-const Header: React.FC<{ onCreateTaskClick: () => void }> = ({ onCreateTaskClick }) => {
+const Header: React.FC = () => {
   const navigate = useNavigate();
+  const { showModal } = useModal();
 
   return (
     <AppBar position="static">
@@ -34,7 +37,7 @@ const Header: React.FC<{ onCreateTaskClick: () => void }> = ({ onCreateTaskClick
           Проекты
         </Link>
         <Box sx={{ flexGrow: 1 }} />
-        <Button onClick={onCreateTaskClick} color="inherit">Создать задачу</Button>
+        <Button onClick={() => showModal(TaskForm)} color="inherit">Создать задачу</Button>
       </Toolbar>
     </AppBar>
   );

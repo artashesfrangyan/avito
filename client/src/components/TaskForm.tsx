@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, ListItemAvatar, Avatar, ListItemText, DialogProps } from '@mui/material';
 import { useGetUsersQuery } from '../store/services/users';
 import { useGetBoardsQuery } from '../store/services/boards';
 import { IFormData } from '../types/form';
@@ -17,7 +17,11 @@ const blankForm: IFormData = {
   status: null
 }
 
-const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose, project, task }) => {
+interface Props extends DialogProps {
+  task?: IFormData
+}
+
+const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
   // Загрузка сохраненных данных из localStorage при инициализации
   const loadSavedFormData = (): IFormData => {
     try {
@@ -28,9 +32,7 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onCl
     }
   };
 
-  const [formValues, setFormValues] = useState<IFormData>(loadSavedFormData);
-
-  console.log(formValues.boardId)
+  const [formValues, setFormValues] = useState<IFormData>(task ?? loadSavedFormData);
 
   // Сохранение данных формы в localStorage при каждом изменении
   useEffect(() => {
@@ -69,12 +71,14 @@ const TaskForm: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onCl
     }
   };
 
-  const handleClose = () => {
-    onClose();
-  };
+  const handleClose = React.useCallback<Exclude<DialogProps['onClose'], undefined>>((...args) => {
+    setFormValues(blankForm); 
+    localStorage.removeItem(FORM_STORAGE_KEY); 
+    onClose(...args);
+  }, [onClose]);
 
   return (
-    <Dialog open={open} onClose={() => {setFormValues(blankForm); localStorage.removeItem(FORM_STORAGE_KEY); handleClose()}}>
+    <Dialog {...props} onClose={handleClose}>
       <DialogTitle>{task ? "Редактирование" : "Создание"} задачи</DialogTitle>
       <DialogContent>
         <TextField

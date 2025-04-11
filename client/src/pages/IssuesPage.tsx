@@ -146,6 +146,7 @@ const IssuesPage: React.FC = () => {
           filteredTasks.map((task) => (
             <ListItem 
               key={task.id} 
+              // onClick={() => navigate(`/board/${task.id}`)}
               onClick={() => navigate(`/board/${task.id}`)}
               sx={{
                 cursor: 'pointer',

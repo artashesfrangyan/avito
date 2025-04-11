@@ -12,8 +12,8 @@ export interface ITask {
   id: number;
   title: string;
   description: string;
-  priority: ITaskStatus;
-  status: ITaskPriority;
+  priority: ITaskPriority;
+  status: ITaskStatus;
   assignee: IAssignee;
   boardName: string;
   board?: {
