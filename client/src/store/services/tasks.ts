@@ -4,26 +4,23 @@ import { ITask, ITaskStatus } from '../../types/task';
 export const tasksApi = createApi({
   reducerPath: 'tasksApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/api/v1' }),
-  tagTypes: ['Tasks'], // Для управления кэшем
+  tagTypes: ['Tasks'],
   endpoints: (builder) => ({
-    // Получение списка задач
     getTasks: builder.query<ITask[], void>({
       query: () => '/tasks',
       transformResponse: (response: { data: ITask[] }) => response.data,
       providesTags: ['Tasks'],
     }),
     
-    // Создание новой задачи
     createTask: builder.mutation<ITask, Partial<ITask>>({
       query: (task) => ({
         url: '/tasks/create',
         method: 'POST',
         body: task,
       }),
-      invalidatesTags: ['Tasks'], // Обновляем список задач после создания
+      invalidatesTags: ['Tasks'],
     }),
     
-    // Обновление задачи
     updateTask: builder.mutation<ITask, Partial<ITask>>({
       query: (task) => ({
         url: `/tasks/update/${task.id}`,
@@ -36,17 +33,16 @@ export const tasksApi = createApi({
           title: task.title
         },
       }),
-      invalidatesTags: ['Tasks'], // Обновляем список задач после изменения
+      invalidatesTags: ['Tasks'],
     }),
 
-    // Обновление статуса задачи
     updateTaskStatus: builder.mutation<ITask, IUpdateStatus>({
         query: ({id, status}) => ({
             url: `/tasks/updateStatus/${id}`,
             method: 'PUT',
             body: {"status": status},
         }),
-        invalidatesTags: ['Tasks'], // Обновляем список задач после обновления
+        invalidatesTags: ['Tasks'],
     }),
 }),
 });
@@ -55,7 +51,6 @@ interface IUpdateStatus {
   status: ITaskStatus
 }
 
-// Экспортируем автоматически сгенерированные хуки
 export const {
   useGetTasksQuery, 
   useCreateTaskMutation, 

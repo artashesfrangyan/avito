@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useGetBoardsQuery } from "../store/services/boards";
 import { useGetTasksQuery } from "../store/services/tasks";
 
+// Хук, мапящий boardId по boardName
 export const useGetTasksWithBoards = () => {
   const { data: tasks, isLoading: tasksLoading, isError: tasksIsError } = useGetTasksQuery();
   const { data: boards, isLoading: boardsLoading, isError: boardsIsError } = useGetBoardsQuery();

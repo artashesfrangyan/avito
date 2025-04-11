@@ -1,11 +1,12 @@
 import { Grid, Card, CardContent, Typography } from '@mui/material';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useGetTasksQuery, useUpdateTaskStatusMutation } from '../store/services/tasks';
+import { useUpdateTaskStatusMutation } from '../store/services/tasks';
 import { ITask } from '../types/task';
 import TaskColumn from '../components/TaskBoard/TaskColumn';
-import { useGetTasksWithBoards } from '../hooks/useGetTasksWithBoards';
+import { useGetBoardTasksQuery } from '../store/services/boards';
+import { useParams } from 'react-router-dom';
 
 const STATUSES: ITask['status'][] = ['Backlog', 'InProgress', 'Done'];
 const COLUMN_NAMES = {
@@ -15,12 +16,15 @@ const COLUMN_NAMES = {
 };
 
 const TaskBoard = () => {
-  const { data: tasks = [], isLoading, isError } = useGetTasksWithBoards();
+  const { id } = useParams();
+
+  const { data: tasks = [], isLoading, isError } = useGetBoardTasksQuery(id);
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
-  const tasksByStatus = useCallback(() => {
+  // Маппинг статусов
+  const statusMap = useMemo(() => {
     return STATUSES.reduce((acc, status) => {
-      acc[status] = tasks.filter(task => task.status === status);
+      acc[status] = tasks ? tasks.filter(task => task.status === status) : [];
       return acc;
     }, {} as Record<ITask['status'], ITask[]>);
   }, [tasks]);
@@ -50,9 +54,9 @@ const TaskBoard = () => {
                   fontSize: '0.875rem',
                   letterSpacing: '0.5px',
                 }}>
-                  {status && COLUMN_NAMES[status]}
+                  {COLUMN_NAMES[status]}
                 </Typography>
-                <TaskColumn status={status} tasks={tasksByStatus()[status]} onDrop={handleDrop} />
+                <TaskColumn status={status} tasks={statusMap[status]} onDrop={handleDrop} />
               </CardContent>
             </Card>
           </Grid>

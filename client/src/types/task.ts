@@ -5,8 +5,8 @@ interface IAssignee {
   avatarUrl: string;
 }
 
-export type ITaskStatus = 'Backlog' | 'InProgress' | 'Done' | null;
-export type ITaskPriority = 'Low' | 'Medium' | 'High' | null;
+export type ITaskStatus = 'Backlog' | 'InProgress' | 'Done';
+export type ITaskPriority = 'Low' | 'Medium' | 'High';
 
 export interface ITask {
   id: number;
