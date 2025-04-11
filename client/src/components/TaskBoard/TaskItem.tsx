@@ -1,21 +1,16 @@
 import { Card, CardContent, Typography, Chip, Stack } from '@mui/material';
 import { ITask } from '../../types/task';
-import { useCallback } from 'react';
+import { useModal } from 'mui-modal-provider';
+import TaskForm from '../TaskForm';
 
-const TaskItem = ({ task, isDragging = false }: { 
-  task: ITask;
-  isDragging?: boolean;
-}) => {
-
+const TaskItem = ({ task, isDragging = false }: { task: ITask; isDragging?: boolean }) => {
   const priorityColors = {
     Low: 'success',
     Medium: 'warning',
     High: 'error'
-  } as const;
+  };
 
-  // const onClick = useCallback(() => {
-
-  // }, [])
+  const { showModal } = useModal();
 
   return (
     <Card
@@ -28,7 +23,7 @@ const TaskItem = ({ task, isDragging = false }: {
           transform: 'scale(1.02)',
         }),
       }}
-      // onClick={onClick}
+      onClick={() => showModal(TaskForm, { task })}
     >
       <CardContent>
         <Typography variant="subtitle1" gutterBottom>

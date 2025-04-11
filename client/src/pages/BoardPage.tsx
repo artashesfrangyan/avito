@@ -38,8 +38,6 @@ const TaskBoard = () => {
     }, {} as Record<ITask['status'], ITask[]>);
   }, [tasks]);
 
-  console.log(id)
-
   const handleDrop = useCallback(async (id: number, newStatus: ITask['status']) => {
     try {
       await updateTaskStatus({ id, status: newStatus }).unwrap();
@@ -58,7 +56,7 @@ const TaskBoard = () => {
         <Typography variant="h4" component="h1" gutterBottom sx={{ 
           mt: 3,
           ml: 3,
-          mb: 3,
+          mb: 0,
           fontWeight: 'bold'
         }}>
           {currentBoardName}

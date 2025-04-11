@@ -21,7 +21,6 @@ export const useGetTasksWithBoards = () => {
     })) || [];
   }, [tasks, boardMap]);
 
-  console.log(tasksWithBoards)
   return {
     data: tasksWithBoards,
     isLoading: tasksLoading || boardsLoading,

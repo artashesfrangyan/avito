@@ -31,7 +31,8 @@ const IssuesPage: React.FC = () => {
     data: tasks, 
     isLoading: isTasksLoading, 
     isError: isTasksError 
-  } = useGetTasksWithBoards();
+  } = useGetTasksWithBoards(); // Определяем boardId
+
   const { showModal } = useModal();
   const handleOpenCreate = () => {
     showModal(TaskForm)

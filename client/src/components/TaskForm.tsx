@@ -12,17 +12,17 @@ const FORM_STORAGE_KEY = 'unsaved_task_form_data';
 const blankForm: Partial<ITask> = {
   title: '',
   description: '',
-  priority: null,
+  priority: undefined,
   assigneeId: undefined,
   boardId: undefined,
-  status: null
+  status: undefined
 }
 
 interface Props extends DialogProps {
   task: Partial<ITask> | null;
 }
 
-const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
+const TaskForm: React.FC<Props> = ({ task, onClose, project, ...props }) => {
   // Загрузка сохраненных данных из localStorage при инициализации
   const loadSavedFormData = (): Partial<ITask> => {
     try {
@@ -33,12 +33,19 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
     }
   };
 
-  const [formValues, setFormValues] = useState<Partial<ITask>>(task ? {...task, assigneeId: task.assignee?.id} : loadSavedFormData);
+  const [formValues, setFormValues] = useState<Partial<ITask>>(task ? {
+    ...task, assigneeId: task.assignee?.id
+  } : project ? {
+    ...blankForm, boardId: project
+  } : loadSavedFormData);
 
   // Сохранение данных формы в localStorage при каждом изменении
   useEffect(() => {
+    if (task) {
+      return // Не сохраняемся в LS, если это редактирование
+    }
     localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formValues));
-  }, [formValues]);
+  }, [task, formValues]);
 
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const [updateTask] = useUpdateTaskMutation();
@@ -62,7 +69,7 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
         await createTask(formValues).unwrap();
       }
       
-      // Очищаем сохраненные данные при успешной отправке
+      // Очищаем сохранённые данные при успешной отправке
       localStorage.removeItem(FORM_STORAGE_KEY);
       onClose();
     } catch (error) {

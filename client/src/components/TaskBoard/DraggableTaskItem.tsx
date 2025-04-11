@@ -1,8 +1,10 @@
 import { useDrag } from 'react-dnd';
 import TaskItem from './TaskItem';
 import { ITask } from '../../types/task';
+import { useRef } from 'react';
 
 const DraggableTaskItem = ({ task }: { task: ITask }) => {
+  const ref = useRef<HTMLDivElement>(null);
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'task',
     item: { id: task.id },
@@ -11,13 +13,16 @@ const DraggableTaskItem = ({ task }: { task: ITask }) => {
     }),
   }));
 
+  // Связываем ref с drag
+  drag(ref);
+
   return (
     <div 
-      ref={drag}
+      ref={ref}
       style={{
         opacity: isDragging ? 0.5 : 1,
-        cursor: 'move',
-        marginBottom: '8px'
+        marginBottom: '8px',
+        cursor: isDragging ? 'grabbing' : 'grab'
       }}
     >
       <TaskItem task={task} />
