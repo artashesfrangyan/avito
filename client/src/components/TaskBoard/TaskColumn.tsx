@@ -39,7 +39,7 @@ const TaskColumn = ({ status, tasks, onDrop }: {
           justifyContent: 'center',
           color: 'text.disabled'
         }}>
-          No tasks in this column
+          В этой колонке нет задач
         </Box>
       )}
     </Box>

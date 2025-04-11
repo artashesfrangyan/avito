@@ -5,8 +5,9 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useUpdateTaskStatusMutation } from '../store/services/tasks';
 import { ITask } from '../types/task';
 import TaskColumn from '../components/TaskBoard/TaskColumn';
-import { useGetBoardTasksQuery } from '../store/services/boards';
+import { useGetBoardsQuery, useGetBoardTasksQuery } from '../store/services/boards';
 import { useParams } from 'react-router-dom';
+import { IBoard } from '../types/board';
 
 const STATUSES: ITask['status'][] = ['Backlog', 'InProgress', 'Done'];
 const COLUMN_NAMES = {
@@ -16,10 +17,16 @@ const COLUMN_NAMES = {
 };
 
 const TaskBoard = () => {
-  const { id } = useParams();
+  const { id } = useParams<{id: string}>();
 
-  const { data: tasks = [], isLoading, isError } = useGetBoardTasksQuery(id);
+  const { data: boardsData } = useGetBoardsQuery();
+  const { data: tasks = [], isLoading, isError } = useGetBoardTasksQuery(id || '');
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
+
+  // Находим текущую доску по id
+  const currentBoard = useMemo(() => {
+    return boardsData?.find((board: IBoard) => board.id === +id);
+  }, [boardsData, id])
 
   // Маппинг статусов
   const statusMap = useMemo(() => {
@@ -42,6 +49,16 @@ const TaskBoard = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      {currentBoard && (
+        <Typography variant="h4" component="h1" gutterBottom sx={{ 
+          mt: 3,
+          ml: 3,
+          mb: 3,
+          fontWeight: 'bold'
+        }}>
+          {currentBoard.name}
+        </Typography>
+      )}
       <Grid container spacing={3} sx={{ p: 3, minHeight: '80vh', flexWrap: 'nowrap', overflowX: 'auto' }}>
         {STATUSES.map((status) => (
           <Grid size={{ xs: 12, md: 4 }} key={status}>
