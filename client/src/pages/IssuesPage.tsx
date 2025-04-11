@@ -23,7 +23,7 @@ import { useGetTasksWithBoards } from '../hooks/useGetTasksWithBoards';
 const IssuesPage: React.FC = () => {
   const [searchTitle, setSearchTitle] = useState('');
   const [searchAssignee, setSearchAssignee] = useState('');
-  const [filterStatus, setFilterStatus] = useState<ITaskStatus>(null);
+  const [filterStatus, setFilterStatus] = useState<ITaskStatus|null>(null);
   const [filterBoard, setFilterBoard] = useState('');
 
   const { data: boards = [] } = useGetBoardsQuery();
@@ -32,7 +32,6 @@ const IssuesPage: React.FC = () => {
     isLoading: isTasksLoading, 
     isError: isTasksError 
   } = useGetTasksWithBoards();
-console.log(tasks)
   const { showModal } = useModal();
   const handleOpenCreate = () => {
     showModal(TaskForm)

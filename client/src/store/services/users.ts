@@ -4,7 +4,7 @@ import { IUser } from '../../types/users';
 export const usersApi = createApi({
   reducerPath: 'usersApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/api/v1' }),
-  tagTypes: ['Users'],
+  tagTypes: ['Users'],  // Теги для кэширования
   endpoints: (builder) => ({
     getUsers: builder.query<IUser[], void>({
       query: () => '/users',

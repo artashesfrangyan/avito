@@ -20,7 +20,9 @@ const TaskBoard = () => {
   const { id } = useParams<{id: string}>();
 
   const { data: boardsData } = useGetBoardsQuery();
-  const { data: tasks = [], isLoading, isError } = useGetBoardTasksQuery(id || '');
+  const { data: tasks = [], isLoading, isError, refetch } = useGetBoardTasksQuery(id || '', {
+    skip: !id // Пропустить запрос если нет id
+  });
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
   // Находим текущую доску по id
@@ -36,9 +38,12 @@ const TaskBoard = () => {
     }, {} as Record<ITask['status'], ITask[]>);
   }, [tasks]);
 
+  console.log(id)
+
   const handleDrop = useCallback(async (id: number, newStatus: ITask['status']) => {
     try {
       await updateTaskStatus({ id, status: newStatus }).unwrap();
+      refetch() // Обновляем доску при перемещении карточки
     } catch (error) {
       console.error('Failed to update task status:', error);
     }

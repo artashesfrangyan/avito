@@ -4,7 +4,7 @@ import { ITask, ITaskStatus } from '../../types/task';
 export const tasksApi = createApi({
   reducerPath: 'tasksApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/api/v1' }),
-  tagTypes: ['Tasks'],
+  tagTypes: ['Tasks'], // Теги для кэширования
   endpoints: (builder) => ({
     getTasks: builder.query<ITask[], void>({
       query: () => '/tasks',
@@ -40,7 +40,7 @@ export const tasksApi = createApi({
         query: ({id, status}) => ({
             url: `/tasks/updateStatus/${id}`,
             method: 'PUT',
-            body: {"status": status},
+            body: {status},
         }),
         invalidatesTags: ['Tasks'],
     }),

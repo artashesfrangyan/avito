@@ -13,9 +13,9 @@ const TaskItem = ({ task, isDragging = false }: {
     High: 'error'
   } as const;
 
-  const onClick = useCallback(() => {
-    
-  }, [])
+  // const onClick = useCallback(() => {
+
+  // }, [])
 
   return (
     <Card
@@ -28,7 +28,7 @@ const TaskItem = ({ task, isDragging = false }: {
           transform: 'scale(1.02)',
         }),
       }}
-      onClick={onClick}
+      // onClick={onClick}
     >
       <CardContent>
         <Typography variant="subtitle1" gutterBottom>
