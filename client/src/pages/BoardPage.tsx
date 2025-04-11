@@ -24,8 +24,8 @@ const TaskBoard = () => {
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
   // Находим текущую доску по id
-  const currentBoard = useMemo(() => {
-    return boardsData?.find((board: IBoard) => board.id === +id);
+  const currentBoardName = useMemo(() => {
+    return boardsData?.find((board: IBoard) => board.id === Number(id))?.name;
   }, [boardsData, id])
 
   // Маппинг статусов
@@ -49,14 +49,14 @@ const TaskBoard = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      {currentBoard && (
+      {currentBoardName && (
         <Typography variant="h4" component="h1" gutterBottom sx={{ 
           mt: 3,
           ml: 3,
           mb: 3,
           fontWeight: 'bold'
         }}>
-          {currentBoard.name}
+          {currentBoardName}
         </Typography>
       )}
       <Grid container spacing={3} sx={{ p: 3, minHeight: '80vh', flexWrap: 'nowrap', overflowX: 'auto' }}>

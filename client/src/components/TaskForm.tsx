@@ -170,7 +170,6 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
       </DialogContent>
       
       <DialogActions>
-        <Button onClick={handleClose}>Отмена</Button>
         <Button 
           onClick={handleSubmit} 
           disabled={isLoading || !formValues.title || !formValues.boardId || !formValues.assigneeId}
