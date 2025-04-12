@@ -1,5 +1,5 @@
 import { Grid, Card, CardContent, Typography } from '@mui/material';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useUpdateTaskStatusMutation } from '../store/services/tasks';
@@ -28,11 +28,17 @@ const TaskBoard = () => {
   });
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
+  useEffect(() => {
+    if (id) {
+      dispatch(setBoardId(Number(id)));
+    }
+  }, [id, dispatch]);
+
   // Находим текущую доску по id
   const currentBoardName = useMemo(() => {
-    dispatch(setBoardId(Number(id)));
     return boardsData?.find((board: IBoard) => board.id === Number(id))?.name;
-  }, [boardsData, id, dispatch])
+  }, [boardsData, id]);
+
 
   // Маппинг статусов
   const statusMap = useMemo(() => {

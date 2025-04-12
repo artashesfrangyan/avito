@@ -27,7 +27,7 @@ interface Props extends DialogProps {
 const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
   const { boardId } = useSelector(selectBoardId);
   const { pathname } = useLocation();
-  
+
   // Загрузка сохраненных данных из localStorage при инициализации
   const loadSavedFormData = (): Partial<ITask> => {
     if (boardId) {
@@ -200,6 +200,7 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
             variant="outlined"
             sx={{ mr: 'auto' }}
             disabled={isLoading || !formValues.boardId}
+            onClick={(e) => onClose && onClose(e, 'escapeKeyDown')}
           >
             Перейти на доску
           </Button>
