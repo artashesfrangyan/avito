@@ -1,54 +1,101 @@
-# React + TypeScript + Vite
+# Project Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Мини-версия системы управления проектами с возможностью создания задач, управления досками и drag-and-drop функционалом.
 
-Currently, two official plugins are available:
+## Установка и запуск
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1) Запустить Docker
+2) Открыть корневую папку проекта (содержит папки client и server) в терминале и ввести make startall
+3) Открыть в браузере http://localhost:5173/boards
 
-## Expanding the ESLint configuration
+## Технологический стек
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Frontend
+- React 18+
+- TypeScript
+- Vite
+- Material-UI
+- Redux Toolkit (RTK Query для управления состоянием и API)
+- React Router DOM
+- React DnD (для drag-and-drop)
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### О выборе технологий:
+1) React Query позволил реализовать прерывание (отмена/прекращение) запросов при переходе со страницы на страницу
+2) Redux Toolkit позволил работать с одним state из разных компонентов без props-drilling и с меньшим объёмом лишнего кода, чем у useContext
+3) Выбрал vite для лёгкой интеграции с vitest для тестирования, а также потому что он даёт эффективный Hot Module Replacement и молниеносную скорость разработки
+4) TypeScript позволили избежать многих ошибок на этапе разработки и сэкономил этим время, а также дал явное объявление типов, что упрощает работу с кодом
+5) Material-UI дал готовые UI-компоненты с гибкой настройкой и минимизацей стилей
+6) React DnD позволили реализовать механизм перетаскивания компонентов. React DnD позволяет настраивать поведение перетаскивания под конкретные нужды проекта. Она не навязывает свою структуру, что удобно для интеграции в разные проекты.
+
+### Testing
+- Vitest
+- Jest
+- React Testing Library
+
+## Основные функции
+
+- 📋 Просмотр всех задач с фильтрацией и поиском
+- 📊 Управление досками проектов
+- ✨ Drag-and-drop для изменения статуса задач
+- 📝 Создание и редактирование задач
+- 💾 Сохранение черновиков форм
+- 🔍 Фильтрация задач по различным параметрам
+
+### Требования к ПО
+- Node.js v20+
+- npm или yarn
+
+## Тестирование
+- Для запуска тестов нужно ввести в консоли npm run test или yarn test
+- Для теста с покрытием нужно ввести в консоли npm run coverage
+
+### Установка зависимостей
+```bash
+# В директории client
+npm install
+# или
+yarn install
 ```
+## Структура проекта 
+├── client/            # Frontend приложение
+│   ├── src/
+│   │   ├── components/
+│   │   ├── store/
+│   │   ├── types/
+│   │   └──...
+│   └── ...
+├── server/            # Backend сервис
+│   └── ...
+└── docker-compose.yml
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Основные маршруты
+[/boards](http://localhost:5173/boards) - Список всех досок
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+[/board/:id](http://localhost:5173/board/1) - Страница конкретной доски
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+[/issues](http://localhost:5173/issues) - Список всех задач
+
+## Особенности реализации:
+# Управление состоянием
+- Использование Redux Toolkit и RTK Query для управления состоянием и запросами к API
+
+- Кэширование и автоматическая инвалидация кэша при обновлениях
+
+# Drag-and-Drop
+- Реализация перетаскивания задач между колонками с помощью react-dnd
+
+# Автоматическое обновление статуса задачи при перетаскивании
+
+# Благодаря RTK Query, реализовано прерывание (отмена/прекращение) запросов при переходе со страницы на страницу
+
+# Формы
+- Сохранение черновиков форм в localStorage (на случай, если форма не была закрыта и пользователь обновил страницу)
+
+- Валидация полей
+
+- Предзаполнение форм при редактировании задачи
+
+# Тестирование
+- Unit-тесты с использованием Vitest
+
+- Настроенное тестовое окружение с поддержкой React Testing Library
