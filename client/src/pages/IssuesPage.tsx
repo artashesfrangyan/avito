@@ -83,7 +83,7 @@ const IssuesPage: React.FC = () => {
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel>Статус</InputLabel>
           <Select
-            value={filterStatus}
+            value={filterStatus || ''}
             onChange={(e) => setFilterStatus(e.target.value as ITaskStatus)}
             label="Статус"
           >

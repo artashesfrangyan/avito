@@ -8,7 +8,8 @@ import TaskColumn from '../components/TaskBoard/TaskColumn';
 import { useGetBoardsQuery, useGetBoardTasksQuery } from '../store/services/boards';
 import { useParams } from 'react-router-dom';
 import { IBoard } from '../types/board';
-import { useBoardContext } from '../hooks/useBoardContext';
+import { setBoardId } from '../store/slices/boardIdSlice';
+import { useDispatch } from 'react-redux';
 
 const STATUSES: ITask['status'][] = ['Backlog', 'InProgress', 'Done'];
 const COLUMN_NAMES = {
@@ -19,7 +20,7 @@ const COLUMN_NAMES = {
 
 const TaskBoard = () => {
   const { id } = useParams<{id: string}>();
-  const { setBoardId } = useBoardContext();
+  const dispatch = useDispatch();
   
   const { data: boardsData } = useGetBoardsQuery();
   const { data: tasks = [], isLoading, isError, refetch } = useGetBoardTasksQuery(id || '', {
@@ -29,9 +30,9 @@ const TaskBoard = () => {
 
   // Находим текущую доску по id
   const currentBoardName = useMemo(() => {
-    setBoardId(Number(id));
+    dispatch(setBoardId(Number(id)));
     return boardsData?.find((board: IBoard) => board.id === Number(id))?.name;
-  }, [boardsData, id, setBoardId])
+  }, [boardsData, id, dispatch])
 
   // Маппинг статусов
   const statusMap = useMemo(() => {
@@ -48,7 +49,7 @@ const TaskBoard = () => {
     } catch (error) {
       console.error('Failed to update task status:', error);
     }
-  }, [updateTaskStatus]);
+  }, [updateTaskStatus, refetch]);
 
   if (isLoading) return <div>Загрузка задач...</div>;
   if (isError) return <div>Ошибка при загрузке задач</div>;

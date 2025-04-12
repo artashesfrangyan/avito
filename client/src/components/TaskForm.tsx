@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, ListItemAvatar, Avatar, ListItemText, DialogProps } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, ListItemAvatar, Avatar, ListItemText, DialogProps, SelectChangeEvent } from '@mui/material';
 import { useGetUsersQuery } from '../store/services/users';
 import { useGetBoardsQuery } from '../store/services/boards';
-import { IFormData } from '../types/form';
 import { useCreateTaskMutation, useUpdateTaskMutation } from '../store/services/tasks';
 import { ITask } from '../types/task';
-import { useBoardContext } from '../hooks/useBoardContext';
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectBoardId } from '../store/slices/boardIdSlice';
 
 // Ключ для сохранения в localStorage
 const FORM_STORAGE_KEY = 'unsaved_task_form_data';
@@ -25,8 +25,8 @@ interface Props extends DialogProps {
 }
 
 const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
-  const { boardId } = useBoardContext();
-  const { pathname } = useLocation()
+  const { boardId } = useSelector(selectBoardId);
+  const { pathname } = useLocation();
   
   // Загрузка сохраненных данных из localStorage при инициализации
   const loadSavedFormData = (): Partial<ITask> => {
@@ -59,7 +59,10 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
   const { data: users = [], isLoading: isUsersLoading } = useGetUsersQuery();
   const { data: boards = [], isLoading: isBoardsLoading } = useGetBoardsQuery();
 
-  const handleChange = (field: keyof IFormData) => (e: React.ChangeEvent<{ value: ITask[typeof field] }>) => {
+  // Управляемый компонент
+  const handleChange = (field: keyof ITask) => (
+    e: React.ChangeEvent<{ value: unknown }> | SelectChangeEvent<unknown>
+  ) => {
     setFormValues(prev => ({
       ...prev,
       [field]: e.target.value
