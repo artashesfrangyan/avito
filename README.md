@@ -74,6 +74,7 @@ yarn install
 [/boards](http://localhost:5173/boards) - Список всех досок
 [/board/:id](http://localhost:5173/board/1) - Страница конкретной доски
 [/issues](http://localhost:5173/issues) - Список всех задач
+# Ссылки будут активны после запуска проекта через docker и команду make startull в консоли в корне проекта
 
 ## Особенности реализации:
 # Управление состоянием
