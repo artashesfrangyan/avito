@@ -27,7 +27,7 @@ interface Props extends DialogProps {
 const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
   const { boardId } = useBoardContext();
   const { pathname } = useLocation()
-  console.log(boardId)
+  
   // Загрузка сохраненных данных из localStorage при инициализации
   const loadSavedFormData = (): Partial<ITask> => {
     if (boardId) {
@@ -59,14 +59,14 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
   const { data: users = [], isLoading: isUsersLoading } = useGetUsersQuery();
   const { data: boards = [], isLoading: isBoardsLoading } = useGetBoardsQuery();
 
-  const handleChange = (field: keyof IFormData) => (e: React.ChangeEvent<{ value: unknown }>) => {
+  const handleChange = (field: keyof IFormData) => (e: React.ChangeEvent<{ value: ITask[typeof field] }>) => {
     setFormValues(prev => ({
       ...prev,
       [field]: e.target.value
     }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: React.SyntheticEvent) => {
     try {
       if (!formValues.boardId || !formValues.assigneeId) return;
       
@@ -78,7 +78,10 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
       
       // Очищаем сохранённые данные при успешной отправке
       localStorage.removeItem(FORM_STORAGE_KEY);
-      onClose();
+  
+      if (onClose) {
+        onClose(event, 'escapeKeyDown');
+      }
     } catch (error) {
       console.error('Ошибка при создании задачи:', error);
     }
@@ -87,7 +90,10 @@ const TaskForm: React.FC<Props> = ({ task, onClose, ...props }) => {
   const handleClose = React.useCallback<Exclude<DialogProps['onClose'], undefined>>((...args) => {
     setFormValues(blankForm); 
     localStorage.removeItem(FORM_STORAGE_KEY); 
-    onClose(...args);
+
+    if (onClose) {
+      onClose(...args);
+    }
   }, [onClose]);
 
   return (
