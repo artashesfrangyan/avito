@@ -56,6 +56,7 @@ npm install
 # или
 yarn install
 ```
+```
 ## Структура проекта 
 ├── client/            # Frontend приложение
 │   ├── src/
@@ -67,7 +68,7 @@ yarn install
 ├── server/            # Backend сервис
 │   └── ...
 └── docker-compose.yml
-
+```
 ## Основные маршруты
 [/boards](http://localhost:5173/boards) - Список всех досок
 
