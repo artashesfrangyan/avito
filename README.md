@@ -56,6 +56,7 @@ yarn install
 - Для теста с покрытием нужно ввести в консоли npm run coverage
 
 ## Структура проекта 
+```
 ├── client/            # Frontend приложение
 │   ├── src/
 │   │   ├── components/
@@ -66,7 +67,7 @@ yarn install
 ├── server/            # Backend сервис
 │   └── ...
 └── docker-compose.yml
-
+```
 ## Основные маршруты
 [/boards](http://localhost:5173/boards) - Список всех досок
 [/board/:id](http://localhost:5173/board/1) - Страница конкретной доски
