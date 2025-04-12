@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, ListItemAvatar, Avatar, ListItemText, DialogProps, SelectChangeEvent } from '@mui/material';
 import { useGetUsersQuery } from '../store/services/users';
-import { useGetBoardsQuery } from '../store/services/boards';
-import { useCreateTaskMutation, useUpdateTaskMutation } from '../store/services/tasks';
+import { useCreateTaskMutation, useGetBoardsQuery, useUpdateTaskMutation } from '../store/services/tasks';
 import { ITask } from '../types/task';
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';

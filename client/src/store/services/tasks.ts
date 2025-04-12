@@ -1,11 +1,14 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { ITask, ITaskStatus } from '../../types/task';
+import { IBoard } from '../../types/board';
 
 export const tasksApi = createApi({
   reducerPath: 'tasksApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/api/v1' }),
-  tagTypes: ['Tasks'], // Теги для кэширования
+  tagTypes: ['Tasks', 'Boards', 'Board'], // Теги для кэширования
   endpoints: (builder) => ({
+    // Методы для Tasks
+
     getTasks: builder.query<ITask[], void>({
       query: () => '/tasks',
       transformResponse: (response: { data: ITask[] }) => response.data,
@@ -18,7 +21,7 @@ export const tasksApi = createApi({
         method: 'POST',
         body: task,
       }),
-      invalidatesTags: ['Tasks'],
+      invalidatesTags: ['Tasks', 'Board'],
     }),
     
     updateTask: builder.mutation<ITask, Partial<ITask>>({
@@ -33,7 +36,7 @@ export const tasksApi = createApi({
           title: task.title
         },
       }),
-      invalidatesTags: ['Tasks'],
+      invalidatesTags: ['Tasks', 'Board'],
     }),
 
     updateTaskStatus: builder.mutation<ITask, IUpdateStatus>({
@@ -42,8 +45,22 @@ export const tasksApi = createApi({
             method: 'PUT',
             body: {status},
         }),
-        invalidatesTags: ['Tasks'],
+        invalidatesTags: ['Tasks', 'Board'],
     }),
+
+    // Методы для работы с Boards
+
+    getBoards: builder.query<IBoard[], void>({
+      query: () => '/boards',
+      transformResponse: (response: { data: IBoard[] }) => response.data,
+      providesTags: ['Boards'],
+    }),
+    
+    getBoardTasks: builder.query<ITask[], string>({
+      query: (id: string) => `/boards/${id}`,
+      providesTags: ['Board'],
+      transformResponse: (response: { data: ITask[] }) => response.data,
+    })
 }),
 });
 interface IUpdateStatus {
@@ -56,4 +73,7 @@ export const {
   useCreateTaskMutation, 
   useUpdateTaskMutation,
   useUpdateTaskStatusMutation,
+
+  useGetBoardsQuery, 
+  useGetBoardTasksQuery 
 } = tasksApi;

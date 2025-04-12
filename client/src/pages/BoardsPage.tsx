@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, List, ListItem, ListItemText, Container, Box } from '@mui/material';
-import { useGetBoardsQuery } from '../store/services/boards';
 import { useNavigate } from 'react-router-dom';
+import { useGetBoardsQuery } from '../store/services/tasks';
 
 const BoardsPage: React.FC = () => {
   const { data: boards } = useGetBoardsQuery();

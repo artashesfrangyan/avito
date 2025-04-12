@@ -1,6 +1,5 @@
 import { useMemo } from "react";
-import { useGetBoardsQuery } from "../store/services/boards";
-import { useGetTasksQuery } from "../store/services/tasks";
+import { useGetBoardsQuery, useGetTasksQuery } from "../store/services/tasks";
 
 // Хук, мапящий boardId по boardName
 export const useGetTasksWithBoards = () => {

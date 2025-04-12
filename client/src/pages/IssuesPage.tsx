@@ -16,9 +16,9 @@ import {
 } from '@mui/material';
 import TaskForm from '../components/TaskForm';
 import { ITaskStatus } from '../types/task';
-import { useGetBoardsQuery } from '../store/services/boards';
 import { useModal } from 'mui-modal-provider';
 import { useGetTasksWithBoards } from '../hooks/useGetTasksWithBoards';
+import { useGetBoardsQuery } from '../store/services/tasks';
 
 const IssuesPage: React.FC = () => {
   const [searchTitle, setSearchTitle] = useState('');

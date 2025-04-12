@@ -2,10 +2,9 @@ import { Grid, Card, CardContent, Typography } from '@mui/material';
 import { useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useUpdateTaskStatusMutation } from '../store/services/tasks';
+import { useGetBoardsQuery, useGetBoardTasksQuery, useUpdateTaskStatusMutation } from '../store/services/tasks';
 import { ITask } from '../types/task';
 import TaskColumn from '../components/TaskBoard/TaskColumn';
-import { useGetBoardsQuery, useGetBoardTasksQuery } from '../store/services/boards';
 import { useParams } from 'react-router-dom';
 import { IBoard } from '../types/board';
 import { setBoardId } from '../store/slices/boardIdSlice';
@@ -23,7 +22,7 @@ const TaskBoard = () => {
   const dispatch = useDispatch();
   
   const { data: boardsData } = useGetBoardsQuery();
-  const { data: tasks = [], isLoading, isError, refetch } = useGetBoardTasksQuery(id || '', {
+  const { data: tasks = [], isLoading, isError } = useGetBoardTasksQuery(id || '', {
     skip: !id // Пропустить запрос если нет id
   });
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
@@ -51,11 +50,11 @@ const TaskBoard = () => {
   const handleDrop = useCallback(async (id: number, newStatus: ITask['status']) => {
     try {
       await updateTaskStatus({ id, status: newStatus }).unwrap();
-      refetch() // Обновляем доску при перемещении карточки
+      // refetch() // Обновляем доску при перемещении карточки
     } catch (error) {
       console.error('Failed to update task status:', error);
     }
-  }, [updateTaskStatus, refetch]);
+  }, [updateTaskStatus]);
 
   if (isLoading) return <div>Загрузка задач...</div>;
   if (isError) return <div>Ошибка при загрузке задач</div>;
