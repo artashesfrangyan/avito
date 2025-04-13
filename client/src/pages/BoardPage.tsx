@@ -23,7 +23,7 @@ const TaskBoard = () => {
   
   const { data: boardsData } = useGetBoardsQuery();
   const { data: tasks = [], isLoading, isError } = useGetBoardTasksQuery(id || '', {
-    skip: !id // Пропустить запрос если нет id
+    skip: !id
   });
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
@@ -38,7 +38,6 @@ const TaskBoard = () => {
     return boardsData?.find((board: IBoard) => board.id === Number(id))?.name;
   }, [boardsData, id]);
 
-
   // Маппинг статусов
   const statusMap = useMemo(() => {
     return STATUSES.reduce((acc, status) => {
@@ -50,47 +49,77 @@ const TaskBoard = () => {
   const handleDrop = useCallback(async (id: number, newStatus: ITask['status']) => {
     try {
       await updateTaskStatus({ id, status: newStatus }).unwrap();
-      // refetch() // Обновляем доску при перемещении карточки
     } catch (error) {
       console.error('Failed to update task status:', error);
     }
   }, [updateTaskStatus]);
 
-  if (isLoading) return <div>Загрузка задач...</div>;
-  if (isError) return <div>Ошибка при загрузке задач</div>;
+  if (isLoading) return <div data-testid="loading-indicator">Загрузка задач...</div>;
+  if (isError) return <div data-testid="error-message">Ошибка при загрузке задач</div>;
 
   return (
     <DndProvider backend={HTML5Backend}>
-      {currentBoardName && (
-        <Typography variant="h4" component="h1" gutterBottom sx={{ 
-          mt: 3,
-          ml: 3,
-          mb: 0,
-          fontWeight: 'bold'
-        }}>
-          {currentBoardName}
-        </Typography>
-      )}
-      <Grid container spacing={3} sx={{ p: 3, minHeight: '80vh', flexWrap: 'nowrap', overflowX: 'auto' }}>
-        {STATUSES.map((status) => (
-          <Grid size={{ xs: 12, md: 4 }} key={status}>
-            <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography variant="h6" gutterBottom sx={{ 
-                  mb: 2,
-                  color: 'text.secondary',
-                  textTransform: 'uppercase',
-                  fontSize: '0.875rem',
-                  letterSpacing: '0.5px',
-                }}>
-                  {COLUMN_NAMES[status]}
-                </Typography>
-                <TaskColumn status={status} tasks={statusMap[status]} onDrop={handleDrop} />
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      <div data-testid="board-page">
+        {currentBoardName && (
+          <Typography 
+            variant="h4" 
+            component="h1" 
+            gutterBottom 
+            sx={{ 
+              mt: 3,
+              ml: 3,
+              mb: 0,
+              fontWeight: 'bold'
+            }}
+            data-testid="board-title"
+          >
+            {currentBoardName}
+          </Typography>
+        )}
+        <Grid 
+          container 
+          spacing={3} 
+          sx={{ p: 3, minHeight: '80vh', flexWrap: 'nowrap', overflowX: 'auto' }}
+          data-testid="board-columns-container"
+        >
+          {STATUSES.map((status) => (
+            <Grid 
+              size={{ xs: 12, md: 4 }} 
+              key={status}
+              data-testid={`column-${status}`}
+            >
+              <Card 
+                variant="outlined" 
+                sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+                data-testid={`card-${status}`}
+              >
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography 
+                    variant="h6" 
+                    gutterBottom 
+                    sx={{ 
+                      mb: 2,
+                      color: 'text.secondary',
+                      textTransform: 'uppercase',
+                      fontSize: '0.875rem',
+                      letterSpacing: '0.5px',
+                    }}
+                    data-testid={`column-title-${status}`}
+                  >
+                    {COLUMN_NAMES[status]}
+                  </Typography>
+                  <TaskColumn 
+                    status={status} 
+                    tasks={statusMap[status]} 
+                    onDrop={handleDrop}
+                    data-testid={`task-column-${status}`}
+                  />
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </div>
     </DndProvider>
   );
 };

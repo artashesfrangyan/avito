@@ -19,6 +19,10 @@ const DraggableTaskItem = ({ task }: { task: ITask }) => {
   return (
     <div 
       ref={ref}
+      data-testid="draggable-task"
+      role="button"
+      tabIndex={0}
+      aria-grabbed={isDragging}
       style={{
         opacity: isDragging ? 0.5 : 1,
         marginBottom: '8px',
@@ -29,5 +33,6 @@ const DraggableTaskItem = ({ task }: { task: ITask }) => {
     </div>
   );
 };
+
 
 export default DraggableTaskItem;

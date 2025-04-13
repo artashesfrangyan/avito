@@ -78,14 +78,16 @@ const IssuesPage: React.FC = () => {
           value={searchAssignee}
           onChange={(e) => setSearchAssignee(e.target.value)}
           sx={{ flex: 1, minWidth: 200 }}
+          data-testid="assignee-search"
         />
 
         <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>Статус</InputLabel>
+          <InputLabel id="status-select-label">Статус</InputLabel>
           <Select
             value={filterStatus || ''}
             onChange={(e) => setFilterStatus(e.target.value as ITaskStatus)}
             label="Статус"
+            data-testid="status-select"
           >
             <MenuItem value="">Все</MenuItem>
             <MenuItem value="Backlog">Backlog</MenuItem>
